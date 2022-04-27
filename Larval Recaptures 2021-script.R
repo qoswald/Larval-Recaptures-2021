@@ -1,16 +1,27 @@
 ##### 1. DATA UPLOAD 
 library(readxl)
 # count data 
-count.dat <- read_excel("larvalcount.xlsx") 
-View(count.dat)
+count.dat <- read_excel("larvalcount.xlsx")
 
 # mean size data 
 size.dat<-read_excel("Size.xlsx") 
-View(size.dat)
+
+# data for population analyses
+# pond data 
+KoVK <- read_excel("KoVK2021.xlsx")
+SG <- read_excel("SG2021.xlsx")
+TG <- read_excel("TG2021.xlsx")
+TT <- read_excel("TT2021.xlsx")
+# stream data 
+KB <- read_excel("KB2021.xlsx")
+KoB <- read_excel("KoB2021.xlsx")
+MB <- read_excel("MB2021.xlsx")
+VB <- read_excel("VB2021.xlsx")
 
 # data for individual larval growth rates
-ind.size <- read_excel("Recapture-Data/Larval_recap_sizes.xlsx") 
+ind.size <- read_excel("Ind-sizes.xlsx") 
 View(ind.size)
+
 
 
 ##### 2. VISUALIZE MONITORING DATA OF LARVAE - COMPARISON OF 2019/20/21
