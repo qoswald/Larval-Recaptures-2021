@@ -14,9 +14,7 @@ View(ind.size)
 
 
 ##### 2. VISUALIZE MONITORING DATA OF LARVAE - COMPARISON OF 2019/20/21
-
 ########## 2.1 PLOT GRAPHS FOR EACH SAMPLE SITE
-
 library(ggplot2)
 
 p1<-ggplot(count.dat, aes(x=date2, y=KoB, group=year, colour=year, shape=year)) +
@@ -132,8 +130,8 @@ p8<-ggplot(count.dat, aes(x=date2, y=TT, group=year, colour=year, shape=year)) +
         legend.text = element_text(family="Arial", size=12, color="black"),
         axis.title.x=element_blank(),)
 
-############### 2.1.1 EXTRACT LEGEND FOR MULTIPLOT 
 
+############### 2.1.1 EXTRACT LEGEND FOR MULTIPLOT 
 get_only_legend <- function(plot) {
   plot_table <- ggplot_gtable(ggplot_build(plot))
   legend_plot <- which(sapply(plot_table$grobs, function(x) x$name) == "guide-box")
@@ -145,7 +143,6 @@ legend1<- get_only_legend(p8)
 
 
 ############### 2.1.2 ARRANGE MARGINS OF PLOTS 
-
 figi<-p1+
   theme(plot.margin = unit(c(0.55,0,0.7,0.7), "cm"),
         plot.title=element_blank(),
@@ -266,3 +263,120 @@ grid.text("Month", x = unit(0.51, "npc"), y = unit(0.11, "npc"), gp=gpar(fontfam
 grid.text("Observed number of larvae", x = unit(0.013, "npc"), y = unit(0.35, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Observed number of larvae", x = unit(0.013, "npc"), y = unit(0.79, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
 dev.off()
+
+
+
+##### 3. PLOT MEAN LARVAL SIZES
+########## 3.1 PLOT GRAPHS FOR EACH SAMPLE SITE
+ps1<-ggplot(size.dat, aes(x=date2, y=KoB, group=year, colour=year, shape=year)) +
+  ggtitle("Stream KoB")+
+  geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4", "goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Larval size")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+
+ps2<-ggplot(size.dat, aes(x=date2, y=KB, group=year, colour=year,shape=year)) +
+  ggtitle("Stream KB")+
+  geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Number of larvae (count)")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+
+ps3<-ggplot(size.dat, aes(x=date2, y=VB, group=year, colour=year, shape=year)) +
+  ggtitle("Stream VB")+
+  geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Number of larvae (count)")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+
+ps4<-ggplot(size.dat, aes(x=date2, y=MB, group=year, colour=year, shape=year)) +
+  ggtitle("Stream MB")+
+  geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Number of larvae (count)")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+
+ps5<-ggplot(size.dat, aes(x=date2, y=KoVK, group=year, colour=year, shape=year)) +
+  ggtitle("Pond KoVK")+
+  geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Number of larvae (count)")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+
+ps6<-ggplot(size.dat, aes(x=date2, y=TG, group=year, colour=year, shape=year)) +
+  ggtitle("Pond TG")+geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Number of larvae (count)")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+
+ps7<-ggplot(size.dat, aes(x=date2, y=SG, group=year, colour=year, shape=year)) +
+  ggtitle("Pond SG")+
+  geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Number of larvae (count)")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+
+ps8<-ggplot(size.dat, aes(x=date2, y=TT, group=year, colour=year, shape=year)) +
+  ggtitle("Pond TT")+
+  geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Number of larvae (count)")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="bottom",
+        legend.title =element_text(family="Arial", size=12, color="black"),
+        legend.text = element_text(family="Arial", size=12, color="black"),
+        axis.title.x=element_blank(),)
