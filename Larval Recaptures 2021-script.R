@@ -514,3 +514,91 @@ grid.text("Month", x = unit(0.51, "npc"), y = unit(0.11, "npc"), gp=gpar(fontfam
 grid.text("Snout-to-tail length (cm)", x = unit(0.013, "npc"), y = unit(0.35, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Snout-to-tail length (cm)", x = unit(0.013, "npc"), y = unit(0.79, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
 dev.off()
+
+
+##### 4. LARVAL RECAPTURE ANALYSES
+library(marked)
+library(R2ucare) # to test for goodness of fit (underlying assumptions)
+library(dplyr) # for tidy data
+library(magrittr) # for pipes
+
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+KoVK.matrix <- KoVK$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(KoVK))
+
+SG.matrix <- SG$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(SG))
+
+TG.matrix <- TG$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(TG))
+
+TT.matrix <- TT$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(TT))
+
+
+KB.matrix <- KB$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(KB))
+
+KoB.matrix <- KoB$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(KoB))
+
+MB.matrix <- MB$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(MB))
+
+VB.matrix <- VB$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(VB))
+
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+# if the overall test gives evidence for a lack of fit (p<0.05), everything is fine
+# otherwise we would have to go on on with further tests
+overall_CJS(KoVK.matrix, rep(1,nrow(KoVK)))
+overall_CJS(SG.matrix, rep(1,nrow(SG)))
+overall_CJS(TG.matrix, rep(1,nrow(TG)))
+overall_CJS(TT.matrix, rep(1,nrow(TT)))
+overall_CJS(KB.matrix, rep(1,nrow(KB)))
+overall_CJS(KoB.matrix, rep(1,nrow(KoB)))
+overall_CJS(MB.matrix, rep(1,nrow(MB)))
+overall_CJS(VB.matrix, rep(1,nrow(VB)))
+# since there is no evidence for lack of fit, everything is fine and we can move on without performing the other two tests
+
+########## 4.1. RECAPTURES IN PONDS
