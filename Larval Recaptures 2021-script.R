@@ -8,15 +8,15 @@ size.dat<-read_excel("Size.xlsx")
 
 # data for population analyses
 # pond data 
-KoVK <- read_excel("KoVK2021.xlsx")
-SG <- read_excel("SG2021.xlsx")
-TG <- read_excel("TG2021.xlsx")
-TT <- read_excel("TT2021.xlsx")
+KoVK <- read_excel("KoVK2021.txt")
+SG <- read_excel("SG2021.txt")
+TG <- read_excel("TG2021.txt")
+TT <- read_excel("TT2021.txt")
 # stream data 
-KB <- read_excel("KB2021.xlsx")
-KoB <- read_excel("KoB2021.xlsx")
-MB <- read_excel("MB2021.xlsx")
-VB <- read_excel("VB2021.xlsx")
+KB <- read_excel("KB2021.txt")
+KoB <- read_excel("KoB2021.txt")
+MB <- read_excel("MB2021.txt")
+VB <- read_excel("VB2021.txt")
 
 # data for individual larval growth rates
 ind.size <- read_excel("Ind-sizes.xlsx") 
@@ -517,88 +517,51 @@ dev.off()
 
 
 ##### 4. LARVAL RECAPTURE ANALYSES
-library(marked)
 library(R2ucare) # to test for goodness of fit (underlying assumptions)
 library(dplyr) # for tidy data
 library(magrittr) # for pipes
-
-# first we have to turn our data into a matrix that is needed to work with R2ucare
-KoVK.matrix <- KoVK$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(KoVK))
-
-SG.matrix <- SG$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(SG))
-
-TG.matrix <- TG$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(TG))
-
-TT.matrix <- TT$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(TT))
-
-
-KB.matrix <- KB$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(KB))
-
-KoB.matrix <- KoB$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(KoB))
-
-MB.matrix <- MB$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(MB))
-
-VB.matrix <- VB$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(VB))
-
-# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
-# if the overall test gives evidence for a lack of fit (p<0.05), everything is fine
-# otherwise we would have to go on on with further tests
-overall_CJS(KoVK.matrix, rep(1,nrow(KoVK)))
-overall_CJS(SG.matrix, rep(1,nrow(SG)))
-overall_CJS(TG.matrix, rep(1,nrow(TG)))
-overall_CJS(TT.matrix, rep(1,nrow(TT)))
-overall_CJS(KB.matrix, rep(1,nrow(KB)))
-overall_CJS(KoB.matrix, rep(1,nrow(KoB)))
-overall_CJS(MB.matrix, rep(1,nrow(MB)))
-overall_CJS(VB.matrix, rep(1,nrow(VB)))
-# since there is no evidence for lack of fit, everything is fine and we can move on without performing the other two tests
+library(RMark)
+MarkPath="D:/UniBieProgramme/MARK"
 
 ########## 4.1. RECAPTURES IN PONDS
+##### 4.1.1. KoVK 
+### 4.1.1.1 based on monthly averages
+KoVK1=read.delim("KoVK1.txt",colClass=c("character","character"))
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+KoVK1.matrix <- KoVK1$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(KoVK1))
+
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(KoVK1.matrix, rep(1,nrow(KoVK1)))
+# since there is no evidence for lack of fit (p>0.05), everything is fine and we can move on without performing other two tests
+
+# First, process data
+KoVK1.proc <- process.data(KoVK1, model = "POPAN")
+# Second, make design data (from processed data)
+KoVK1.dd <- make.design.data(KoVK1.proc)
+fit.KoVK1.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = KoVK1.proc, ddl = KoVK1.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)
+}
+# Run function
+KoVK1.models <- fit.KoVK1.model()
+KoVK1.models
+summary(KoVK1.models[[4]], se=TRUE)
+KoVK1.models[[4]]$results$derived
