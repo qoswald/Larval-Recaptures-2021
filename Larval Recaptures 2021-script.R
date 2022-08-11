@@ -2,13 +2,71 @@
 
 #Rscript to the paper: "Population monitoring of fire salamanders (Salamandra salamandra) with a new photo-recognition software "
 #authors: P. Oswald, B. Tunnat & B. A. Caspers
-#created
-#last modified
+#created: 27-04-2022
+#last modified: 
 
 ####################################################################################################################################################################################################
 
+# 1. LARVAL RECAPTURE ANALYSES TO OBTAIN RECAPTURE RATES, SURVIVAL, ESTIMATED POPULATION SIZE
 
-# 1. TEMPERATURE REGIMES IN PONDS AND STREAMS 
+# needed packages
+library(R2ucare) # to test for goodness of fit (underlying assumptions)
+library(dplyr) # for tidy data
+library(magrittr) # for pipes
+library(RMark)
+MarkPath="D:/UniBieProgramme/MARK" # set path to were the Mark pogram is saved on your computer
+
+## ponds
+# KoVK 
+# based on weekly averages
+# upload and manipulate data
+KoVK=read.delim("KoVK.txt",colClass=c("character","character"))
+KoVKmut <- mutate(KoVK, across(c(ID), as.factor))
+str(KoVKmut)
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+KoVK.matrix <- KoVKmut$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(KoVKmut))
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(KoVK.matrix, rep(1,nrow(KoVKmut)))
+# if p>0.05 no evidence for lack of fit
+# process data
+KoVK.proc <- process.data(KoVKmut, model = "POPAN")
+# Smake design data (from processed data)
+KoVK.dd <- make.design.data(KoVK.proc)
+fit.KoVK.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = KoVK.proc, ddl = KoVK.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)}
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
+# Run functions
+KoVK.models <- fit.KoVK.model()
+KoVK.models
+summary(KoVK.models[[2]], se=TRUE)
+KoVK.models[[2]]$results$derived
+
+
+
+
+####################################################################################################################################################################################################
+
+# 2. TEMPERATURE REGIMES IN PONDS AND STREAMS 
 ## import rawdata
 Sys.setlocale("LC_TIME", "English") # this helps R to read the right date format from your raw data, if formatted as yyyy-mm-dd
 library(readxl)
@@ -109,7 +167,7 @@ dev.off()
 
 ####################################################################################################################################################################################################
 
-# 2. NUMBER OF LARVAE
+# 3. NUMBER OF LARVAE
 
 ## import rawdata
 Sys.setlocale("LC_TIME", "English") # this helps R to read the right date format from your raw data, if formatted as yyyy-mm-dd
@@ -449,7 +507,7 @@ dev.off()
 
 ####################################################################################################################################################################################################
 
-# 3. MEAN LARVAL SIZES
+# 4. MEAN LARVAL SIZES
 
 # import rawdata
 Sys.setlocale("LC_TIME", "English") # this helps R to read the right date format from your raw data, if formatted as yyyy-mm-dd
@@ -802,7 +860,7 @@ dev.off()
 
 ####################################################################################################################################################################################################
 
-# 4. INDIVIDUAL GROWTH 
+# 5. INDIVIDUAL GROWTH 
 # import rawdata
 library(readxl)
 ind.dat <- read_excel("Ind-sizes.xlsx", na="NA",
@@ -923,7 +981,7 @@ dev.off()
 
 ####################################################################################################################################################################################################
 
-# 5. DATA ON INJURED LARVAE
+# 6. DATA ON INJURED LARVAE
 # import rawdata
 library(readxl)
 overall. <- read_excel("2021_Meandata-Mastertable.xlsx", na="NA",
@@ -1034,60 +1092,3 @@ dev.off()
 
 ####################################################################################################################################################################################################
 
-##### 4. LARVAL RECAPTURE ANALYSES TO OBTAIN RECAPTURE RATES, SURVIVAL, ESTIMATED POPULATION SIZE
-
-# needed packages
-library(R2ucare) # to test for goodness of fit (underlying assumptions)
-library(dplyr) # for tidy data
-library(magrittr) # for pipes
-library(RMark)
-MarkPath="D:/UniBieProgramme/MARK" # set path to were the Mark pogram is saved on your computer
-
-## ponds
-# KoVK 
-# based on weekly averages
-# upload and manipulate data
-KoVK=read.delim("KoVK.txt",colClass=c("character","character"))
-KoVKmut <- mutate(KoVK, across(c(ID), as.factor))
-str(KoVKmut)
-
-# first we have to turn our data into a matrix that is needed to work with R2ucare
-KoVK.matrix <- KoVKmut$ch %>%
-  strsplit('') %>%
-  sapply(`[`) %>%
-  t() %>%
-  unlist() %>%
-  as.numeric %>%
-  matrix(nrow = nrow(KoVKmut))
-
-# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
-overall_CJS(KoVK.matrix, rep(1,nrow(KoVKmut)))
-# if p>0.05 no evidence for lack of fit
-
-# First, process data
-KoVK.proc <- process.data(KoVKmut, model = "POPAN")
-# Second, make design data (from processed data)
-KoVK.dd <- make.design.data(KoVK.proc)
-fit.KoVK.model <- function(){
-  # Phi formulas
-  Phi.dot <- list(formula=~1)
-  Phi.time <- list(formula=~time)
-  # p formulas
-  p.dot <- list(formula=~1)
-  # pent formulas
-  pent.time <- list(formula=~-1+time)
-  pent.dot <- list(formula=~1)
-  # Nsuper formulas
-  N.dot <- list(formula=~1)
-  cml <- create.model.list("POPAN")
-  results <- mark.wrapper(cml, data = KoVK.proc, ddl = KoVK.dd,
-                          external = FALSE, accumulate = FALSE, hessian = TRUE)
-  return(results)
-}
-# set directory where Mark-ouptut is saved
-setwd("D:/Mark_output")
-# Run function
-KoVK.models <- fit.KoVK.model()
-KoVK.models
-summary(KoVK.models[[2]], se=TRUE)
-KoVK.models[[2]]$results$derived
