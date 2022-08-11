@@ -43,6 +43,7 @@ library(bestNormalize)
 (yeojohnson_water <- yeojohnson(water.sub$water.temp))
 (sqrt_water <- sqrt(water.sub$water.temp))
 (log_water <- log(water.sub$water.temp))
+
 # then have a look at the histograms of the different transformations for first impression
 par(mfrow = c(2,4)) # display all histograms in one window
 hist(water.sub$water.temp)
@@ -53,6 +54,7 @@ MASS::truehist(orderNorm_water$x.t, main = "orderNorm transformation", nbins = 1
 MASS::truehist(yeojohnson_water$x.t, main = "Yeo-Johnson transformation", nbins = 12)
 MASS::truehist(sqrt_water, main = "squareroot transformation", nbins = 12)
 MASS::truehist(log_water, main = "log transformation", nbins = 12)
+
 # let R suggest best transformation
 bn.water<-bestNormalize(water.sub$water.temp, out_of_sample = FALSE) # out_of_sample = do not perform repeated cross-validation; otherwise you'll get different results every time you run this code
 bn.water 
@@ -175,7 +177,6 @@ countplot<-
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
-  geom_text(x=1.5, y=100, size=(0.36*12), family="Arial", fontface="plain", label="Linear mixed effect model, habitat: p = ???")+ # factor 0.36 to get same font size as theme
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond (N=57)","Stream (N=61)"))+
   theme_classic(base_size=12, base_family="Arial")+
@@ -803,7 +804,6 @@ dev.off()
 
 # 4. INDIVIDUAL GROWTH 
 # import rawdata
-Sys.setlocale("LC_TIME", "English") # this helps R to read the right date format from your raw data, if formatted as yyyy-mm-dd
 library(readxl)
 ind.dat <- read_excel("Ind-sizes.xlsx", na="NA",
                        col_types = c("text", "text", "text","numeric","date","numeric","text","numeric",
@@ -840,6 +840,7 @@ MASS::truehist(orderNorm_ind$x.t, main = "orderNorm transformation", nbins = 12)
 MASS::truehist(yeojohnson_ind$x.t, main = "Yeo-Johnson transformation", nbins = 12)
 MASS::truehist(sqrt_ind, main = "squareroot transformation", nbins = 12)
 MASS::truehist(log_ind, main = "log transformation", nbins = 12)
+
 # let R recommend the most suitable transformation method
 bn.ind<-bestNormalize(ind.sub$daily.growth, out_of_sample = FALSE) 
 bn.ind 
@@ -915,6 +916,117 @@ growthplot<-
 
 setwd("D:/Plots/Mark_recapture")
 png("growthplot.png", height=150, width=200, units="mm", res=300);print(growthplot)
+dev.off()
+
+
+
+
+####################################################################################################################################################################################################
+
+# 5. DATA ON INJURED LARVAE
+# import rawdata
+library(readxl)
+overall. <- read_excel("2021_Meandata-Mastertable.xlsx", na="NA",
+                       col_types = c("text", "text", "numeric", "date","date", "text", "text", "numeric", 
+                                     "numeric", "numeric", "numeric", "numeric", "numeric", 
+                                     "numeric", "numeric"))
+
+## set categories
+library(dplyr)
+overall.dat <- mutate(overall., across(c(sample.site:year, session:observer), as.factor))
+str(overall.dat)
+
+# prepare and inspect data
+inj.sub<-subset(overall.dat, sample.site!="KoB")
+hist(inj.sub$perc.injured)
+
+## find best transformation for data
+# first, create objects with the transformations, e.g. logarithm etc.
+library(bestNormalize)
+(arcsinh_inj <- arcsinh_x(inj.sub$perc.injured))
+(boxcox_inj <- boxcox(inj.sub$perc.injured))
+(centerscale_inj <- center_scale(inj.sub$perc.injured))
+(orderNorm_inj <- orderNorm(inj.sub$perc.injured))
+(yeojohnson_inj <- yeojohnson(inj.sub$perc.injured))
+(sqrt_inj <- sqrt(inj.sub$perc.injured))
+(log_inj <- log(inj.sub$perc.injured))
+
+# then have a look at the histograms of the different transformations for first impression
+par(mfrow = c(2,4)) # display all histograms in one window
+hist(inj.sub$perc.injured)
+MASS::truehist(arcsinh_inj$x.t, main = "Arcsinh transformation", nbins = 12) # x.t stands for the transformed variable
+MASS::truehist(boxcox_inj$x.t, main = "Box Cox transformation", nbins = 12)
+MASS::truehist(centerscale_inj$x.t, main = "center_scale transformation", nbins = 12)
+MASS::truehist(orderNorm_inj$x.t, main = "orderNorm transformation", nbins = 12)
+MASS::truehist(yeojohnson_inj$x.t, main = "Yeo-Johnson transformation", nbins = 12)
+MASS::truehist(sqrt_inj, main = "squareroot transformation", nbins = 12)
+MASS::truehist(log_inj, main = "log transformation", nbins = 12)
+
+# let R recommend the most suitable transformation method
+bn.inj<-bestNormalize(inj.sub$perc.injured, out_of_sample = FALSE) 
+bn.inj 
+
+## create an object for the best transformation
+cs.inj <- centerscale_inj$x.t # centerscale transformation
+
+## add the new object as column to your data frame
+inj.transformed <- cbind(inj.sub, cs.inj)
+str(inj.transformed)
+hist(inj.transformed$on.inj)
+
+## test for normal distribution and homogeneity of variance of the transformed variable
+shapiro.test(inj.transformed$cs.inj) 
+var.test(inj.transformed$cs.inj ~ inj.transformed$habitat) 
+
+# transformation did not normalise data
+# use other distribution?
+library(performance)
+library(ResourceSelection)
+
+mod1<-glm(perc.injured~habitat, data=inj.sub, family=poisson(link="log"))
+mod2<-lm(perc.injured~habitat, data=inj.sub)
+check_distribution(mod1)
+hoslem.test(inj.dat.omit$perc.injured, fitted(mod1)) # goodness of fit test
+check_model(mod1)
+check_model(mod2)
+
+# Check Model Residuals
+library(DHARMa)
+mod1.res<- simulateResiduals(mod1)
+plot(mod1.res) 
+testDispersion(mod1) 
+mod2.res<- simulateResiduals(mod2)
+plot(mod2.res)
+testDispersion(mod2) 
+
+# still doesn't look good, use simple non-parametric test (Wilcoxon)
+# implemented in the following
+
+
+# plot percentage of injured larvae across all years and sample sites
+
+library(plyr)
+library(ggplot2)
+library(ggpubr) 
+count(inj.sub, "habitat")
+
+injuries<-
+  ggplot(data=inj.sub, aes(habitat,perc.injured), fill=habitat)+
+  geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
+  geom_jitter(aes(fill=habitat), shape=21)+
+  scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  stat_compare_means(method="wilcox.test", label="p.signif",  label.x = 1.5, label.y = 1)+ # pvalue=0.0056
+  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  scale_x_discrete(labels=c("Pond (N=88)","Stream (N=66)"))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(x="Habitat type", y="Rate of injured larvae")+
+  scale_y_continuous(breaks=seq(0,1,0.25), limits = c(0, 1))+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none")
+
+setwd("D:/Plots/Mark_recapture")
+png("injuries.png", height=150, width=200, units="mm", res=300);print(injuries)
 dev.off()
 
 
