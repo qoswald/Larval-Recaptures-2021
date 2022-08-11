@@ -1,11 +1,11 @@
-###################################################################################################################################
+####################################################################################################################################################################################################
 
 #Rscript to the paper: "Population monitoring of fire salamanders (Salamandra salamandra) with a new photo-recognition software "
 #authors: P. Oswald, B. Tunnat & B. A. Caspers
 #created
 #last modified
 
-###################################################################################################################################
+####################################################################################################################################################################################################
 
 
 # 1. TEMPERATURE REGIMES IN PONDS AND STREAMS 
@@ -72,8 +72,14 @@ var.test(water.transformed$on.water ~ water.transformed$habitat)
 # run model and investigate model output
 library(lme4)
 library(lmerTest)
-modwat<-lmer(on.water ~ habitat + year + (1|sample.site) + (1|date.actual), data=water.transformed)
+modwat<-lmer(on.water ~ habitat + (1|sample.site/year) + (1|session/year), data=water.transformed)
+modwat1<-lmer(on.water ~ sample.site + (1|session/year), data=water.transformed)
 summary(modwat)
+summary(modwat1)
+
+# check model
+library(performance)
+check_model(modwat)
 
 # plot as boxplot
 library(plyr)
@@ -86,7 +92,6 @@ watertemp<-
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
-  geom_text(x=1.5, y=25, size=(0.36*12), family="Arial", fontface="plain", label="Linear mixed effect model, habitat: p = 0.226")+ # factor 0.36 to get same font size as theme
   scale_x_discrete(labels=c("Pond (N=88)","Stream (N=66)"))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(x="Habitat type", y="Water temperature (°C)")+
@@ -100,7 +105,7 @@ png("watertemp.png", height=150, width=200, units="mm", res=300);print(watertemp
 dev.off()
 
 
-###################################################################################################################################
+####################################################################################################################################################################################################
 
 # 2. NUMBER OF LARVAE
 
@@ -154,29 +159,7 @@ count.transformed <- cbind(count.sub, on.count)
 str(count.transformed)
 hist(count.transformed$on.count)
 
-## test for normal distribution and homogeneity of variance of the transformed variable
-shapiro.test(count.transformed$on.count) 
-var.test(count.transformed$on.count ~ count.transformed$habitat) 
-
-# set up models with different combinations of fixed and random effects 
-library(lme4)
-library(lmerTest)
-library(performance)
-
-plot()
-mcount0<-lm(on.count~habitat, data=count.transformed) # without random effects
-mcount1<-lm(on.count~habitat+sample.site , data=count.transformed)
-mcount2<-lmer(on.count~habitat+(1|sample.site/year), data=count.transformed)
-mcount3<-lmer(on.count~habitat+(1|sample.site)+(1|session/year), data=count.transformed)
-mcount4<-lmer(on.count~habitat+(1|sample.site)+(1|session/year)+(1|water.temp), data=count.transformed)
-mcount5<-lmer(on.count~habitat+(1|sample.site)+(1|session/year)+(1|water.temp)+(1|observer), data=count.transformed)
-AIC(mcount0,mcount1,mcount2,mcount3,mcount4) # mcount 2 has lowest AIC
-# make diagnostic plots to check the model, normality of residuals is the most important part
-check_model(mcount2)
-summary(mcount2)
-
-
-# plot number of larvae as boxplot
+# plot number of larvae as boxplot just for inspection
 library(plyr)
 library(ggpubr) 
 count(count.transformed, "habitat")
@@ -204,8 +187,7 @@ countplot<-
 dev.off()
 
 
-# 2. MONITORING DATA OF LARVAE
-# 2.1 Plot Graphs FOR EACH SAMPLE SITE
+## Plot graphs for each sample site
 library(ggplot2)
 
 count.KB<-subset(overall.dat, sample.site=="KB")
@@ -331,7 +313,7 @@ p8<-ggplot(count.TT, aes(x=date.simplified, y=n.total, group=year, colour=year, 
         axis.title.x=element_blank(),)
 
 
-############### 2.1.1 EXTRACT LEGEND FOR MULTIPLOT 
+# extract legend for multiplot 
 get_only_legend <- function(plot) {
   plot_table <- ggplot_gtable(ggplot_build(plot))
   legend_plot <- which(sapply(plot_table$grobs, function(x) x$name) == "guide-box")
@@ -342,7 +324,7 @@ get_only_legend <- function(plot) {
 legend1<- get_only_legend(p8)
 
 
-############### 2.1.2 ARRANGE MARGINS OF PLOTS 
+# arrange margins of plot 
 figi<-p1+
   theme(plot.margin = unit(c(0.55,0,0.7,0.7), "cm"),
         plot.title=element_blank(),
@@ -403,11 +385,10 @@ figp<-p8+
         legend.position = "none")
 
 
-############### 2.1.3 CREATE MULTIPLOT
+# create multiplot
 library(gridExtra)
 library(grid)
 Multiplot1<-grid.arrange(figi, figj, figk, figl, figm, fign, figo, figp, ncol=4)
-
 Multiplot1a<-grid.arrange(Multiplot1, legend1, ncol=1, heights = c(10, 1))
 grid.text("Stream KoB", x = unit(0.16, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Stream KB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
@@ -465,24 +446,113 @@ png("multiplot-count.png", height=150, width=200, units="mm", res=300);print(Mul
 dev.off()
 
 
+####################################################################################################################################################################################################
 
-##### 3. PLOT MEAN LARVAL SIZES
-########## 3.1 PLOT GRAPHS FOR EACH SAMPLE SITE
-ps1<-ggplot(size.dat, aes(x=date2, y=KoB, group=year, colour=year, shape=year)) +
-  ggtitle("Stream KoB")+
-  geom_line(aes(color=year), size=0.5)+
-  geom_point(aes(color=year))+
-  scale_shape_manual(values=c(16,4,5))+
-  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4", "goldenrod"))+
-  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+# 3. MEAN LARVAL SIZES
+
+# import rawdata
+Sys.setlocale("LC_TIME", "English") # this helps R to read the right date format from your raw data, if formatted as yyyy-mm-dd
+library(readxl)
+overall. <- read_excel("2021_Meandata-Mastertable.xlsx", na="NA",
+                       col_types = c("text", "text", "numeric", "date","date", "text", "text", "numeric", 
+                                     "numeric", "numeric", "numeric", "numeric", "numeric", 
+                                     "numeric", "numeric"))
+
+## set categories
+library(dplyr)
+overall.dat <- mutate(overall., across(c(sample.site:year, session:observer), as.factor))
+str(overall.dat)
+
+# prepare and inspect data
+mean.sub<-subset(overall.dat, sample.site!="KoB")
+# no need to remove "ssfs", because this was already considered in the raw-data, mean size was calculated without "ssfs"
+str(mean.sub)
+hist(mean.sub$mean.size)
+
+## find best transformation for data
+# first, create objects with the transformations, e.g. logarithm etc.
+library(bestNormalize)
+(arcsinh_mean <- arcsinh_x(mean.sub$mean.size))
+(boxcox_mean <- boxcox(mean.sub$mean.size))
+(centerscale_mean <- center_scale(mean.sub$mean.size))
+(orderNorm_mean <- orderNorm(mean.sub$mean.size))
+(yeojohnson_mean <- yeojohnson(mean.sub$mean.size))
+(sqrt_mean <- sqrt(mean.sub$mean.size))
+(log_mean <- log(mean.sub$mean.size))
+
+# then have a look at the histograms of the different transformations for first impression
+par(mfrow = c(2,4)) # display all histograms in one window
+hist(mean.sub$mean.size)
+MASS::truehist(arcsinh_mean$x.t, main = "Arcsinh transformation", nbins = 12) # x.t stands for the transformed variable
+MASS::truehist(boxcox_mean$x.t, main = "Box Cox transformation", nbins = 12)
+MASS::truehist(centerscale_mean$x.t, main = "center_scale transformation", nbins = 12)
+MASS::truehist(orderNorm_mean$x.t, main = "orderNorm transformation", nbins = 12)
+MASS::truehist(yeojohnson_mean$x.t, main = "Yeo-Johnson transformation", nbins = 12)
+MASS::truehist(sqrt_mean, main = "squareroot transformation", nbins = 12)
+MASS::truehist(log_mean, main = "log transformation", nbins = 12)
+# let R recommend the most suitable transformation method
+bn.mean<-bestNormalize(mean.sub$mean.size, out_of_sample = FALSE) 
+bn.mean 
+
+## create an object for the best transformation
+on.mean <- orderNorm_mean$x.t # ordernorm transformation
+
+## add the new object as column to your data frame
+mean.transformed <- cbind(mean.sub, on.mean)
+str(mean.transformed)
+hist(mean.transformed$on.mean)
+
+## test for normal distribution and homogeneity of variance of the transformed variable
+shapiro.test(mean.transformed$on.mean) 
+var.test(mean.transformed$on.mean ~ mean.transformed$habitat) 
+
+# set up models
+library(lme4)
+library(lmerTest)
+library(performance)
+
+msize0<-lm(on.mean~habitat, data=mean.transformed)
+msize1<-lmer(on.mean~habitat+(1|sample.site)+(1|session/year), data=mean.transformed)
+msize2<-lmer(on.mean~habitat+ water.temp + (1|sample.site)+(1|session/year), data=mean.transformed)
+summary(msize0)
+summary(msize1)
+summary(msize2)
+
+# check models
+AIC(msize0,msize1, msize2) # msize 2 has lowest AIC
+check_model(msize2) 
+compare_performance(msize0,msize1, msize2, rank = T) # msize2 best performance score
+
+# plot mean larval size as boxplot over all years and all sample sites
+library(plyr)
+library(ggpubr) 
+count(overall.dat, "habitat")
+hist(overall.dat$mean.size)
+shapiro.test(overall.dat$mean.size) # non-normal
+var.test(overall.dat$mean.size ~ overall.dat$habitat) #okay
+
+sizeplot<-
+  ggplot(data=overall.dat, aes(habitat,mean.size), fill=habitat)+
+  geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
+  geom_jitter(aes(fill=habitat), shape=21)+
+  scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  scale_x_discrete(labels=c("Pond (N=57)","Stream (N=61)"))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(y="Larval size")+
+  labs(x="Habitat type", y="Mean larval size (cm)")+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
-        legend.position="none",
-        axis.title.x=element_blank(),)
+        legend.position="none")
 
-ps2<-ggplot(size.dat, aes(x=date2, y=KB, group=year, colour=year,shape=year)) +
+setwd("D:/Plots/Mark_recapture")
+png("sizeplot.png", height=150, width=200, units="mm", res=300);print(sizeplot)
+dev.off()
+
+
+## plot graphs for each sample site
+mean.KB<-subset(overall.dat, sample.site=="KB")
+ps1<-ggplot(mean.KB, aes(x=date.simplified, y=mean.size, group=year, colour=year,shape=year)) +
   ggtitle("Stream KB")+
   geom_line(aes(color=year), size=0.5)+
   geom_point(aes(color=year))+
@@ -490,13 +560,14 @@ ps2<-ggplot(size.dat, aes(x=date2, y=KB, group=year, colour=year,shape=year)) +
   scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
   scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(y="Number of larvae (count)")+
+  labs(y="Mean larval size (cm)")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none",
         axis.title.x=element_blank(),)
 
-ps3<-ggplot(size.dat, aes(x=date2, y=VB, group=year, colour=year, shape=year)) +
+mean.VB<-subset(overall.dat, sample.site=="VB")
+ps2<-ggplot(mean.VB, aes(x=date.simplified, y=mean.size, group=year, colour=year, shape=year)) +
   ggtitle("Stream VB")+
   geom_line(aes(color=year), size=0.5)+
   geom_point(aes(color=year))+
@@ -504,13 +575,14 @@ ps3<-ggplot(size.dat, aes(x=date2, y=VB, group=year, colour=year, shape=year)) +
   scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
   scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(y="Number of larvae (count)")+
+  labs(y="Mean larval size (cm)")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none",
         axis.title.x=element_blank(),)
 
-ps4<-ggplot(size.dat, aes(x=date2, y=MB, group=year, colour=year, shape=year)) +
+mean.MB<-subset(overall.dat, sample.site=="MB")
+ps3<-ggplot(mean.MB, aes(x=date.simplified, y=mean.size, group=year, colour=year, shape=year)) +
   ggtitle("Stream MB")+
   geom_line(aes(color=year), size=0.5)+
   geom_point(aes(color=year))+
@@ -518,13 +590,29 @@ ps4<-ggplot(size.dat, aes(x=date2, y=MB, group=year, colour=year, shape=year)) +
   scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
   scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(y="Number of larvae (count)")+
+  labs(y="Mean larval size (cm)")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none",
         axis.title.x=element_blank(),)
 
-ps5<-ggplot(size.dat, aes(x=date2, y=KoVK, group=year, colour=year, shape=year)) +
+mean.KoB<-subset(overall.dat, sample.site=="KoB")
+ps4<-ggplot(mean.KoB, aes(x=date.simplified, y=mean.size, group=year, colour=year, shape=year)) +
+  ggtitle("Stream KoB")+
+  geom_line(aes(color=year), size=0.5)+
+  geom_point(aes(color=year))+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("lightsteelblue4", "darkseagreen4", "goldenrod"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Mean larval size (cm)")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+
+mean.KoVK<-subset(overall.dat, sample.site=="KoVK")
+ps5<-ggplot(mean.KoVK, aes(x=date.simplified, y=mean.size, group=year, colour=year, shape=year)) +
   ggtitle("Pond KoVK")+
   geom_line(aes(color=year), size=0.5)+
   geom_point(aes(color=year))+
@@ -532,26 +620,28 @@ ps5<-ggplot(size.dat, aes(x=date2, y=KoVK, group=year, colour=year, shape=year))
   scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
   scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(y="Number of larvae (count)")+
+  labs(y="Mean larval size (cm)")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none",
         axis.title.x=element_blank(),)
 
-ps6<-ggplot(size.dat, aes(x=date2, y=TG, group=year, colour=year, shape=year)) +
+mean.TG<-subset(overall.dat, sample.site=="TG")
+ps6<-ggplot(mean.TG, aes(x=date.simplified, y=mean.size, group=year, colour=year, shape=year)) +
   ggtitle("Pond TG")+geom_line(aes(color=year), size=0.5)+
   geom_point(aes(color=year))+
   scale_shape_manual(values=c(16,4,5))+
   scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
   scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(y="Number of larvae (count)")+
+  labs(y="Mean larval size (cm)")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none",
         axis.title.x=element_blank(),)
 
-ps7<-ggplot(size.dat, aes(x=date2, y=SG, group=year, colour=year, shape=year)) +
+mean.SG<-subset(overall.dat, sample.site=="SG")
+ps7<-ggplot(mean.SG, aes(x=date.simplified, y=mean.size, group=year, colour=year, shape=year)) +
   ggtitle("Pond SG")+
   geom_line(aes(color=year), size=0.5)+
   geom_point(aes(color=year))+
@@ -559,13 +649,14 @@ ps7<-ggplot(size.dat, aes(x=date2, y=SG, group=year, colour=year, shape=year)) +
   scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
   scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(y="Number of larvae (count)")+
+  labs(y="Mean larval size (cm)")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none",
         axis.title.x=element_blank(),)
 
-ps8<-ggplot(size.dat, aes(x=date2, y=TT, group=year, colour=year, shape=year)) +
+mean.TT<-subset(overall.dat, sample.site=="TT")
+ps8<-ggplot(mean.TT, aes(x=date.simplified, y=mean.size, group=year, colour=year, shape=year)) +
   ggtitle("Pond TT")+
   geom_line(aes(color=year), size=0.5)+
   geom_point(aes(color=year))+
@@ -573,7 +664,7 @@ ps8<-ggplot(size.dat, aes(x=date2, y=TT, group=year, colour=year, shape=year)) +
   scale_color_manual(values=c("lightsteelblue4", "darkseagreen4","goldenrod"))+
   scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(y="Number of larvae (count)")+
+  labs(y="Mean larval size (cm)")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="bottom",
@@ -581,11 +672,11 @@ ps8<-ggplot(size.dat, aes(x=date2, y=TT, group=year, colour=year, shape=year)) +
         legend.text = element_text(family="Arial", size=12, color="black"),
         axis.title.x=element_blank(),)
 
-############### 3.1.1 EXTRACT LEGEND FOR MULTIPLOT 
+# extract legend for multiplot
 legend2 <- get_only_legend(ps8)
 
 
-############### 3.1.2 ARRANGE MARGINS OF PLOTS 
+# arrange margins of plots 
 fps1<-ps1+
   theme(plot.margin = unit(c(0.55,0,0.7,0.7), "cm"),
         plot.title=element_blank(),
@@ -645,11 +736,8 @@ fps8<-ps8+
         axis.text.x=element_blank(),
         legend.position = "none")
 
-############### 3.1.3 CREATE MULTIPLOT
+# create multiplot
 Multiplot2<-grid.arrange(fps1, fps2, fps3, fps4, fps5, fps6, fps7, fps8, ncol=4)
-
-setwd("D:/Plots/Recapture")
-png("multiplot-meansize.png", height=150, width=200, units="mm", res=300);print(Multiplot2)
 Multiplot2a<-grid.arrange(Multiplot2, legend2, ncol=1, heights = c(10, 1))
 grid.text("Stream KoB", x = unit(0.155, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Stream KB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
@@ -702,38 +790,173 @@ grid.text("A", x = unit(0.957, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily
 grid.text("Month", x = unit(0.51, "npc"), y = unit(0.11, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Snout-to-tail length (cm)", x = unit(0.013, "npc"), y = unit(0.35, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Snout-to-tail length (cm)", x = unit(0.013, "npc"), y = unit(0.79, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
+
+# save on local harddrive
+setwd("D:/Plots/Recapture")
+png("multiplot-meansize.png", height=150, width=200, units="mm", res=300);print(Multiplot2)
 dev.off()
 
 
-##### 4. LARVAL RECAPTURE ANALYSES
+
+
+####################################################################################################################################################################################################
+
+# 4. INDIVIDUAL GROWTH 
+# import rawdata
+Sys.setlocale("LC_TIME", "English") # this helps R to read the right date format from your raw data, if formatted as yyyy-mm-dd
+library(readxl)
+ind.dat <- read_excel("Ind-sizes.xlsx", na="NA",
+                       col_types = c("text", "text", "text","numeric","date","numeric","text","numeric",
+                                     "numeric","numeric","numeric","text")) 
+
+## set categories
+library(dplyr)
+ind.size <- mutate(ind.dat, across(c(ID:sample.site, observer, note), as.factor))
+str(ind.size)
+    
+# prepare and inspect data
+ind.size1<-subset(ind.size, sample.site!="KoB")
+ind.sub<-subset(ind.size1, note!="ssf")
+hist(ind.sub$daily.growth)
+
+## find best transformation for data
+# first, create objects with the transformations, e.g. logarithm etc.
+library(bestNormalize)
+(arcsinh_ind <- arcsinh_x(ind.sub$daily.growth))
+(boxcox_ind <- boxcox(ind.sub$daily.growth))
+(centerscale_ind <- center_scale(ind.sub$daily.growth))
+(orderNorm_ind <- orderNorm(ind.sub$daily.growth))
+(yeojohnson_ind <- yeojohnson(ind.sub$daily.growth))
+(sqrt_ind <- sqrt(ind.sub$daily.growth))
+(log_ind <- log(ind.sub$daily.growth))
+
+# then have a look at the histograms of the different transformations for first impression
+par(mfrow = c(2,4)) # display all histograms in one window
+hist(ind.sub$daily.growth)
+MASS::truehist(arcsinh_ind$x.t, main = "Arcsinh transformation", nbins = 12) # x.t stands for the transformed variable
+MASS::truehist(boxcox_ind$x.t, main = "Box Cox transformation", nbins = 12)
+MASS::truehist(centerscale_ind$x.t, main = "center_scale transformation", nbins = 12)
+MASS::truehist(orderNorm_ind$x.t, main = "orderNorm transformation", nbins = 12)
+MASS::truehist(yeojohnson_ind$x.t, main = "Yeo-Johnson transformation", nbins = 12)
+MASS::truehist(sqrt_ind, main = "squareroot transformation", nbins = 12)
+MASS::truehist(log_ind, main = "log transformation", nbins = 12)
+# let R recommend the most suitable transformation method
+bn.ind<-bestNormalize(ind.sub$daily.growth, out_of_sample = FALSE) 
+bn.ind 
+
+## create an object for the best transformation
+on.ind <- orderNorm_ind$x.t # ordernorm transformation
+
+## add the new object as column to your data frame
+ind.transformed <- cbind(ind.sub, on.ind)
+str(ind.transformed)
+hist(ind.transformed$on.ind)
+
+## test for normal distribution and homogeneity of variance of the transformed variable
+shapiro.test(ind.transformed$on.ind) 
+var.test(ind.transformed$on.ind ~ ind.transformed$habitat) 
+
+# set up models
+library(lme4)
+library(lmerTest)
+library(performance)
+
+mind0<-lmer(on.ind~habitat+(1|ID)+(1|timespan),data=ind.transformed)
+mind1<-lmer(on.ind~habitat+water.temp+(1|ID)+(1|timespan),data=ind.transformed)
+mind2<-lmer(on.ind~habitat+(1|ID)+(1|timespan),data=ind.transformed)
+mind3<-lmer(on.ind~habitat+water.temp+(1|ID)+(1|timespan)+(1|sample.site),data=ind.transformed)
+mind4<-lmer(on.ind~habitat+(1|ID)+(1|timespan)+(1|sample.site),data=ind.transformed)
+mind5<-lmer(on.ind~habitat+water.temp+(1|ID)+(1|timespan)+(1|sample.site)+(1|session),data=ind.transformed)
+mind6<-lmer(on.ind~habitat+(1|ID)+(1|timespan)+(1|sample.site)+(1|session),data=ind.transformed)
+
+# warning boundary fit is singular, it might mean that the variances of the random effects are near zero, that is not a problem for the models
+# you can check the variances with glmmTMB
+# if it's not about the variances there might be another/bigger problem
+library(glmmTMB)
+glmmTMB(on.ind~habitat+water.temp+(1|ID)+(1|timespan),data=ind.transformed)
+
+AIC(mind0,mind1,mind2,mind3,mind4,mind5,mind6) # mind1 best supported
+compare_performance(mind0,mind1,mind2,mind3,mind4,mind5,mind6, rank = T) # mind1 and mind6 equally supported
+
+check_model(mind1)
+summary(mind1)
+summary(mind6)
+
+# plot individual growth as boxplot
+library(readxl)
+ind.dat.2 <- read_excel("Individual_growth.xlsx", 
+                         col_types = c("text", "text", "text", "numeric", "numeric", "numeric", "numeric","numeric", 
+                                       "numeric","numeric", "numeric", "numeric","numeric", "numeric","numeric", "numeric",
+                                       "numeric", "numeric", "numeric", "numeric", "numeric", "numeric", "numeric","text")) 
+
+library(plyr)
+library(ggpubr) 
+count(ind.dat.2, "notes")
+growtha<-subset(ind.dat.2, notes!="ssf"| is.na(notes))
+growth<-subset(growtha, sample.site!="KoB") # remove KoB, since it's in between pond and stream
+count(growth, "habitat")
+hist(growth$daily.growth.rate)
+shapiro.test(growth$daily.growth.rate) # non-normal
+var.test(growth$daily.growth.rate ~ growth$habitat) #okay
+
+growthplot<-
+  ggplot(data=growth, aes(habitat,daily.growth.rate), fill=habitat)+
+  geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
+  geom_jitter(aes(fill=habitat), shape=21)+
+  scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  scale_x_discrete(labels=c("Pond (N=63)","Stream (N=65)"))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(x="Habitat type", y="Daily growth rate (cm)")+
+  scale_y_continuous(breaks=seq(-0.025,0.05,0.025), limits = c(-0.025, 0.065))+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none")
+
+setwd("D:/Plots/Mark_recapture")
+png("growthplot.png", height=150, width=200, units="mm", res=300);print(growthplot)
+dev.off()
+
+
+
+
+####################################################################################################################################################################################################
+
+##### 4. LARVAL RECAPTURE ANALYSES TO OBTAIN RECAPTURE RATES, SURVIVAL, ESTIMATED POPULATION SIZE
+
+# needed packages
 library(R2ucare) # to test for goodness of fit (underlying assumptions)
 library(dplyr) # for tidy data
 library(magrittr) # for pipes
 library(RMark)
-MarkPath="D:/UniBieProgramme/MARK"
+MarkPath="D:/UniBieProgramme/MARK" # set path to were the Mark pogram is saved on your computer
 
-########## 4.1. RECAPTURES IN PONDS
-##### 4.1.1. KoVK 
-### 4.1.1.1 based on monthly averages
-KoVK1=read.delim("KoVK1.txt",colClass=c("character","character"))
+## ponds
+# KoVK 
+# based on weekly averages
+# upload and manipulate data
+KoVK=read.delim("KoVK.txt",colClass=c("character","character"))
+KoVKmut <- mutate(KoVK, across(c(ID), as.factor))
+str(KoVKmut)
+
 # first we have to turn our data into a matrix that is needed to work with R2ucare
-KoVK1.matrix <- KoVK1$ch %>%
+KoVK.matrix <- KoVKmut$ch %>%
   strsplit('') %>%
   sapply(`[`) %>%
   t() %>%
   unlist() %>%
   as.numeric %>%
-  matrix(nrow = nrow(KoVK1))
+  matrix(nrow = nrow(KoVKmut))
 
 # now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
-overall_CJS(KoVK1.matrix, rep(1,nrow(KoVK1)))
-# since there is no evidence for lack of fit (p>0.05), everything is fine and we can move on without performing other two tests
+overall_CJS(KoVK.matrix, rep(1,nrow(KoVKmut)))
+# if p>0.05 no evidence for lack of fit
 
 # First, process data
-KoVK1.proc <- process.data(KoVK1, model = "POPAN")
+KoVK.proc <- process.data(KoVKmut, model = "POPAN")
 # Second, make design data (from processed data)
-KoVK1.dd <- make.design.data(KoVK1.proc)
-fit.KoVK1.model <- function(){
+KoVK.dd <- make.design.data(KoVK.proc)
+fit.KoVK.model <- function(){
   # Phi formulas
   Phi.dot <- list(formula=~1)
   Phi.time <- list(formula=~time)
@@ -745,12 +968,14 @@ fit.KoVK1.model <- function(){
   # Nsuper formulas
   N.dot <- list(formula=~1)
   cml <- create.model.list("POPAN")
-  results <- mark.wrapper(cml, data = KoVK1.proc, ddl = KoVK1.dd,
+  results <- mark.wrapper(cml, data = KoVK.proc, ddl = KoVK.dd,
                           external = FALSE, accumulate = FALSE, hessian = TRUE)
   return(results)
 }
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
 # Run function
-KoVK1.models <- fit.KoVK1.model()
-KoVK1.models
-summary(KoVK1.models[[4]], se=TRUE)
-KoVK1.models[[4]]$results$derived
+KoVK.models <- fit.KoVK.model()
+KoVK.models
+summary(KoVK.models[[2]], se=TRUE)
+KoVK.models[[2]]$results$derived
