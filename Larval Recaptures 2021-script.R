@@ -1505,7 +1505,7 @@ recaptures<-
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(x="Habitat type", y="Rrecapture rate")+
+  labs(x="Habitat type", y="Recapture rate")+
   scale_y_continuous(breaks=seq(0,1,0.25), limits = c(0, 1))+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
@@ -1628,4 +1628,116 @@ dev.off()
 
 ####################################################################################################################################################################################################
 
+# 9. ESTIMATED POPULATION SIZE
 
+# import rawdata
+library(readxl)
+recap.surv <- read_excel("recapture<-survival.xlsx", na="NA",
+                         col_types = c("text", "text", "numeric", "date", "numeric", "numeric","numeric", "numeric","numeric",
+                                       "numeric", "numeric"))
+
+## set categories
+library(dplyr)
+nest. <- mutate(recap.surv, across(c(sample.site:habitat), as.factor))
+str(nest.)
+
+# prepare and inspect data
+nest.sub<-subset(nest., sample.site!="KoB")
+hist(nest.sub$Nest)
+
+## find best transformation for data
+# first, create objects with the transformations, e.g. logarithm etc.
+library(bestNormalize)
+(arcsinh_nest <- arcsinh_x(nest.sub$phi))
+(boxcox_nest <- boxcox(nest.sub$phi))
+(centerscale_nest <- center_scale(nest.sub$phi))
+(orderNorm_nest <- orderNorm(nest.sub$phi))
+(yeojohnson_nest <- yeojohnson(nest.sub$phi))
+(sqrt_nest <- sqrt(nest.sub$phi))
+(log_nest <- log(nest.sub$phi))
+(exp_nest<-exp_x(nest.sub$phi, standardize = TRUE))
+
+# then have a look at the histograms of the different transformations for first impression
+par(mfrow = c(2,4)) # display all histograms in one window
+hist(nest.sub$Nest)
+MASS::truehist(arcsinh_nest$x.t, main = "Arcsinh transformation", nbins = 12) # x.t stands for the transformed variable
+MASS::truehist(boxcox_nest$x.t, main = "Box Cox transformation", nbins = 12)
+MASS::truehist(centerscale_nest$x.t, main = "center_scale transformation", nbins = 12)
+MASS::truehist(orderNorm_nest$x.t, main = "orderNorm transformation", nbins = 12)
+MASS::truehist(yeojohnson_nest$x.t, main = "Yeo-Johnson transformation", nbins = 12)
+MASS::truehist(sqrt_nest, main = "squareroot transformation", nbins = 12)
+MASS::truehist(log_nest, main = "log transformation", nbins = 12)
+
+# let R recommend the most suitable transformation method
+bn.nest<-bestNormalize(nest.sub$Nest, out_of_sample = FALSE) 
+bn.nest
+
+## create an object for the best transformation
+on.nest <- orderNorm_nest$x.t # ordernorm transformation
+
+## add the new object as column to your data frame
+nest.transformed <- cbind(nest.sub, on.nest)
+str(nest.transformed)
+hist(nest.transformed$on.nest)
+
+## test for normal distribution and homogeneity of variance of the transformed variable
+shapiro.test(nest.transformed$on.nest)
+var.test(nest.transformed$on.nest~ nest.transformed$habitat) 
+
+# transformation did not normalise data
+# use other distribution?
+library(performance)
+library(ResourceSelection)
+library(lme4)
+library(lmerTest)
+
+mod7<-glm(Nest~habitat, data=nest.sub, family=poisson(link="log"))
+mod8<-lm(Nest~habitat, data=nest.sub)
+check_distribution(mod7)
+check_distribution(mod8)
+check_model(mod7)
+check_model(mod8) # this model looks quite okay and way better than mod5, take this
+
+# Check Model Residuals
+library(DHARMa)
+mod7.res<- simulateResiduals(mod7)
+plot(mod7.res) 
+testDispersion(mod7) # not good
+mod8.res<- simulateResiduals(mod8)
+plot(mod8.res)
+testDispersion(mod8) #  looks okay, so take linear model
+
+# set up models
+mnest0<-lm(Nest~habitat,data=nest.sub)
+mnest1<-lmer(Nest~habitat + (1|sample.site),data=nest.sub)
+mnest2<-lmer(Nest~habitat+(1|occasion),data=nest.sub)
+mnest3<-lmer(Nest~habitat+(1|sample.site)+(1|occasion),data=nest.sub)
+AIC(mnest0, mnest1, mnest2, mnest3) # mnest3 most supported
+compare_performance(mnest0, mnest1, mnest2, mnest3, rank = T) # mnest3 most supported
+summary(mnest3)
+check_model(mnest3) # looks good
+
+
+# plot population estimates per habitat
+library(plyr)
+library(ggplot2)
+library(ggpubr) 
+count(nest.sub, "habitat")
+
+estimates<-
+  ggplot(data=nest.sub, aes(habitat,Nest), fill=habitat)+
+  geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
+  geom_jitter(aes(fill=habitat), shape=21)+
+  scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(x="Habitat type", y="Estimated number of larvae")+
+  scale_y_continuous(breaks=seq(0,1500,300), limits = c(0, 1500))+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none")
+
+setwd("D:/Plots/Mark_recapture")
+png("estimatedpopsize.png", height=150, width=200, units="mm", res=300);print(estimates)
+dev.off()
