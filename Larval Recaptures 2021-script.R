@@ -1403,8 +1403,8 @@ dev.off()
 # import rawdata
 library(readxl)
 recap.surv <- read_excel("recapture<-survival.xlsx", na="NA",
-                      col_types = c("text", "text", ,"numeric","date","numeric","text","numeric",
-                                    "numeric","numeric","numeric","text")) 
+                         col_types = c("text", "text", "numeric", "date", "numeric", "numeric","numeric", "numeric","numeric",
+                                       "numeric", "numeric"))
 
 ## set categories
 library(dplyr)
@@ -1442,7 +1442,7 @@ bn.recap<-bestNormalize(recap.sub$r, out_of_sample = FALSE)
 bn.recap
 
 ## create an object for the best transformation
-arc.recap <- arcsinh_recap$x.t # ordernorm transformation
+arc.recap <- arcsinh_recap$x.t # arcsinh transformation
 
 ## add the new object as column to your data frame
 recap.transformed <- cbind(recap.sub, arc.recap)
@@ -1476,7 +1476,7 @@ mod4.res<- simulateResiduals(mod4)
 plot(mod4.res)
 testDispersion(mod4) # okay
 
-# mod 4 looks okay, maybe linear model is okay
+# mod 4 looks okay, take linear model
 
 # set up models
 mrecap0<-lm(r~habitat,data=recap.sub)
@@ -1488,12 +1488,10 @@ compare_performance(mrecap0, mrecap1, mrecap2, mrecap3, rank = T) # mrecap3 most
 summary(mrecap0)
 summary(mrecap3)
 check_model(mrecap0)
-check_model(mrecap3) # this model looks better than mrecap0, take this
-
+check_model(mrecap3) # this model looks quite okay and way better than mrecap0, take this
 
 
 # plot recapture rates per habitat
-
 library(plyr)
 library(ggplot2)
 library(ggpubr) 
@@ -1520,4 +1518,114 @@ dev.off()
 
 
 ####################################################################################################################################################################################################
+
+# 8. SURVIVAL
+
+# import rawdata
+library(readxl)
+recap.surv <- read_excel("recapture<-survival.xlsx", na="NA",
+                         col_types = c("text", "text", "numeric", "date", "numeric", "numeric","numeric", "numeric","numeric",
+                                       "numeric", "numeric"))
+
+## set categories
+library(dplyr)
+surv. <- mutate(recap.surv, across(c(sample.site:habitat), as.factor))
+str(surv.)
+
+# prepare and inspect data
+surv.sub<-subset(surv., sample.site!="KoB")
+hist(surv.sub$phi)
+
+## find best transformation for data
+# first, create objects with the transformations, e.g. logarithm etc.
+library(bestNormalize)
+(arcsinh_surv <- arcsinh_x(surv.sub$phi))
+(boxcox_surv <- boxcox(surv.sub$phi))
+(centerscale_surv <- center_scale(surv.sub$phi))
+(orderNorm_surv <- orderNorm(surv.sub$phi))
+(yeojohnson_surv <- yeojohnson(surv.sub$phi))
+(sqrt_surv <- sqrt(surv.sub$phi))
+(log_surv <- log(surv.sub$phi))
+(exp_surv<-exp_x(surv.sub$phi, standardize = TRUE))
+
+# then have a look at the histograms of the different transformations for first impression
+par(mfrow = c(2,4)) # display all histograms in one window
+hist(surv.sub$phi)
+MASS::truehist(arcsinh_surv$x.t, main = "Arcsinh transformation", nbins = 12) # x.t stands for the transformed variable
+MASS::truehist(boxcox_surv$x.t, main = "Box Cox transformation", nbins = 12)
+MASS::truehist(centerscale_surv$x.t, main = "center_scale transformation", nbins = 12)
+MASS::truehist(orderNorm_surv$x.t, main = "orderNorm transformation", nbins = 12)
+MASS::truehist(yeojohnson_surv$x.t, main = "Yeo-Johnson transformation", nbins = 12)
+MASS::truehist(sqrt_surv, main = "squareroot transformation", nbins = 12)
+MASS::truehist(log_surv, main = "log transformation", nbins = 12)
+
+# let R recommend the most suitable transformation method
+bn.surv<-bestNormalize(surv.sub$phi, out_of_sample = FALSE) 
+bn.surv
+
+## create an object for the best transformation
+exp.surv <- exp_surv$x.t # exponential transformation
+
+## add the new object as column to your data frame
+surv.transformed <- cbind(surv.sub, exp.surv)
+str(surv.transformed)
+hist(surv.transformed$exp.surv)
+
+## test for normal distribution and homogeneity of variance of the transformed variable
+shapiro.test(surv.transformed$exp.surv)
+var.test(surv.transformed$phi~ surv.transformed$habitat) 
+
+# transformation did not normalise data
+# use other distribution?
+library(performance)
+library(ResourceSelection)
+library(lme4)
+library(lmerTest)
+
+mod5<-glm(phi~habitat, data=surv.sub, family=poisson(link="log"))
+mod6<-lm(phi~habitat, data=surv.sub)
+check_distribution(mod5)
+check_distribution(mod6)
+check_model(mod5)
+check_model(mod6) # this model looks quite okay and way better than mod5, take this
+
+# Check Model Residuals
+library(DHARMa)
+mod5.res<- simulateResiduals(mod5)
+plot(mod5.res) 
+testDispersion(mod5) # not good
+mod6.res<- simulateResiduals(mod6)
+plot(mod6.res)
+testDispersion(mod6) #  QQ-Plot okay, but homogeneity of variances not good
+
+# better go for non-parametric comparison of means as implemented in the following plot
+
+# plot survival per habitat
+library(plyr)
+library(ggplot2)
+library(ggpubr) 
+count(surv.sub, "habitat")
+
+survival<-
+  ggplot(data=surv.sub, aes(habitat,phi), fill=habitat)+
+  geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
+  geom_jitter(aes(fill=habitat), shape=21)+
+  scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(x="Habitat type", y="Survival rate")+
+  scale_y_continuous(breaks=seq(0,1,0.25), limits = c(0, 1))+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none")
+
+setwd("D:/Plots/Mark_recapture")
+png("survival.png", height=150, width=200, units="mm", res=300);print(survival)
+dev.off()
+
+
+
+####################################################################################################################################################################################################
+
 
