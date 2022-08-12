@@ -443,6 +443,8 @@ modwat<-lmer(on.water ~ habitat + (1|sample.site/year) + (1|session/year), data=
 modwat1<-lmer(on.water ~ sample.site + (1|session/year), data=water.transformed)
 summary(modwat)
 summary(modwat1)
+AIC(modwat,modwat1) # modwat most supported
+compare_performance(modwat, modwat1,rank=T) # modwat most supported
 
 # check model
 library(performance)
@@ -1347,11 +1349,8 @@ var.test(inj.transformed$cs.inj ~ inj.transformed$habitat)
 # transformation did not normalise data
 # use other distribution?
 library(performance)
-library(ResourceSelection)
-
 mod1<-glm(perc.injured~habitat, data=inj.sub, family=poisson(link="log"))
 mod2<-lm(perc.injured~habitat, data=inj.sub)
-check_distribution(mod1)
 check_model(mod1)
 check_model(mod2)
 
@@ -1456,15 +1455,12 @@ var.test(recap.transformed$arc.recap ~ recap.transformed$habitat)
 # transformation did not normalise data
 # use other distribution?
 library(performance)
-library(ResourceSelection)
 library(lme4)
 library(lmerTest)
 
 mod3<-glm(r~habitat, data=recap.sub, family=poisson(link="log"))
 mod4<-lm(r~habitat, data=recap.sub)
-check_distribution(mod3)
-check_distribution(mod4)
-check_model(mod3)
+heck_model(mod3)
 check_model(mod4)
 
 # Check Model Residuals
@@ -1519,7 +1515,7 @@ dev.off()
 
 ####################################################################################################################################################################################################
 
-# 8. SURVIVAL
+# 8. SURVIVAL RATES
 
 # import rawdata
 library(readxl)
@@ -1578,14 +1574,11 @@ var.test(surv.transformed$phi~ surv.transformed$habitat)
 # transformation did not normalise data
 # use other distribution?
 library(performance)
-library(ResourceSelection)
 library(lme4)
 library(lmerTest)
 
 mod5<-glm(phi~habitat, data=surv.sub, family=poisson(link="log"))
 mod6<-lm(phi~habitat, data=surv.sub)
-check_distribution(mod5)
-check_distribution(mod6)
 check_model(mod5)
 check_model(mod6) # this model looks quite okay and way better than mod5, take this
 
@@ -1687,14 +1680,11 @@ var.test(nest.transformed$on.nest~ nest.transformed$habitat)
 # transformation did not normalise data
 # use other distribution?
 library(performance)
-library(ResourceSelection)
 library(lme4)
 library(lmerTest)
 
 mod7<-glm(Nest~habitat, data=nest.sub, family=poisson(link="log"))
 mod8<-lm(Nest~habitat, data=nest.sub)
-check_distribution(mod7)
-check_distribution(mod8)
 check_model(mod7)
 check_model(mod8) # this model looks quite okay and way better than mod5, take this
 
