@@ -754,12 +754,14 @@ figp<-p8+
 # create multiplot
 library(gridExtra)
 library(grid)
+setwd("D:/Plots/Mark_recapture")
+png("multiplot-count.png", height=150, width=200, units="mm", res=300);print(Multiplot1)
 Multiplot1<-grid.arrange(figi, figj, figk, figl, figm, fign, figo, figp, ncol=4)
 Multiplot1a<-grid.arrange(Multiplot1, legend1, ncol=1, heights = c(10, 1))
-grid.text("Stream KoB", x = unit(0.16, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
-grid.text("Stream KB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
-grid.text("Stream VB", x = unit(0.63, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
-grid.text("Stream MB", x = unit(0.86, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Stream KB", x = unit(0.16, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Stream VB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Stream MB", x = unit(0.63, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("(Stream) KoB", x = unit(0.86, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Pond KoVK", x = unit(0.16, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Pond TG", x = unit(0.375, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Pond SG", x = unit(0.63, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
@@ -807,8 +809,6 @@ grid.text("A", x = unit(0.957, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily
 grid.text("Month", x = unit(0.51, "npc"), y = unit(0.11, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Observed number of larvae", x = unit(0.013, "npc"), y = unit(0.35, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Observed number of larvae", x = unit(0.013, "npc"), y = unit(0.79, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
-setwd("D:/Plots/Recapture")
-png("multiplot-count.png", height=150, width=200, units="mm", res=300);print(Multiplot1)
 dev.off()
 
 
@@ -1103,12 +1103,16 @@ fps8<-ps8+
         legend.position = "none")
 
 # create multiplot
+library(gridExtra)
+library(grid)
+setwd("D:/Plots/Mark_recapture")
+png("multiplot-meansize.png", height=150, width=200, units="mm", res=300);print(Multiplot2)
 Multiplot2<-grid.arrange(fps1, fps2, fps3, fps4, fps5, fps6, fps7, fps8, ncol=4)
 Multiplot2a<-grid.arrange(Multiplot2, legend2, ncol=1, heights = c(10, 1))
-grid.text("Stream KoB", x = unit(0.155, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
-grid.text("Stream KB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
-grid.text("Stream VB", x = unit(0.63, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
-grid.text("Stream MB", x = unit(0.86, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Stream KB", x = unit(0.155, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Stream VB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Stream MB", x = unit(0.63, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("(Stream) KoB", x = unit(0.86, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Pond KoVK", x = unit(0.155, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Pond TG", x = unit(0.375, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Pond SG", x = unit(0.63, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
@@ -1156,10 +1160,6 @@ grid.text("A", x = unit(0.957, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily
 grid.text("Month", x = unit(0.51, "npc"), y = unit(0.11, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Snout-to-tail length (cm)", x = unit(0.013, "npc"), y = unit(0.35, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Snout-to-tail length (cm)", x = unit(0.013, "npc"), y = unit(0.79, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
-
-# save on local harddrive
-setwd("D:/Plots/Recapture")
-png("multiplot-meansize.png", height=150, width=200, units="mm", res=300);print(Multiplot2)
 dev.off()
 
 
@@ -1289,7 +1289,7 @@ dev.off()
 
 ####################################################################################################################################################################################################
 
-# 6. DATA ON INJURED LARVAE
+# 6. PERCENTAGE OF INJURED LARVAE
 # import rawdata
 library(readxl)
 overall. <- read_excel("2021_Meandata-Mastertable.xlsx", na="NA",
@@ -1741,3 +1741,407 @@ estimates<-
 setwd("D:/Plots/Mark_recapture")
 png("estimatedpopsize.png", height=150, width=200, units="mm", res=300);print(estimates)
 dev.off()
+
+
+# plot single plots for each sample sites
+library(readr)
+library(ggplot2)
+pop.est <- read_delim("pop-est-larvae_allinone.csv", delim = ";")
+
+pop.est.1<-subset(pop.est, KB.week.Nest!="NA")
+pop.est.2<-subset(pop.est, KB.avr.Nest!="NA")
+e1<-ggplot(pop.est, aes(x=date), y=KB.week.Nest,) + ggtitle("Stream KB")+
+  geom_ribbon(data=pop.est.1,aes(x=date, ymax=(KB.week.Nest+KB.week.Nest.se), ymin=(KB.week.Nest-KB.week.Nest.se), alpha=.3), fill="black")+ 
+  geom_ribbon(data=pop.est.2,aes(x=date, ymax=(KB.avr.Nest+KB.avr.Nest.se),  ymin=(KB.avr.Nest-KB.avr.Nest.se), alpha=.3), fill="darkgrey")+ 
+  geom_point(data=pop.est.1,aes(y=KB.week.Nest),color = "black")+
+  geom_path(data=pop.est.1,aes(y=KB.week.Nest),color = "black")+ 
+  geom_path(data=pop.est.1,aes(y=(KB.week.Nest+KB.week.Nest.se)),color = "black", linetype="dashed")+
+  geom_path(data=pop.est.1,aes(y=(KB.week.Nest-KB.week.Nest.se)),color = "black",linetype="dashed")+
+  geom_path(data=pop.est.2,aes(y=KB.avr.Nest),color = "darkgrey")+
+  geom_point(data=pop.est.2,aes(y=KB.avr.Nest),color = "darkgrey", shape=2)+
+  geom_path(data=pop.est.2,aes(y=(KB.avr.Nest+KB.avr.Nest.se)),color = "darkgrey", linetype="dashed")+
+  geom_path(data=pop.est.2,aes(y=(KB.avr.Nest-KB.avr.Nest.se)),color = "darkgrey",linetype="dashed")+
+  scale_y_continuous(breaks=seq(0,800,100), limits = c(0, 800))+
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-12-15")))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Estimated number of larvae", x="Month")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+e1
+
+
+pop.est.3<-subset(pop.est, VB.week.Nest!="NA")
+pop.est.4<-subset(pop.est, VB.avr.Nest!="NA")
+e2<-ggplot(pop.est, aes(x=date), y=VB.week.Nest,) +
+  ggtitle("Stream VB")+
+  geom_ribbon(data=pop.est.3,aes(x=date, ymax=(VB.week.Nest+VB.week.Nest.se), 
+                                 ymin=(VB.week.Nest-VB.week.Nest.se), alpha=.3), fill="black")+ 
+  geom_ribbon(data=pop.est.4,aes(x=date, ymax=(VB.avr.Nest+VB.avr.Nest.se), 
+                                 ymin=(VB.avr.Nest-VB.avr.Nest.se), alpha=.3), fill="darkgrey")+ 
+  geom_point(data=pop.est.3,aes(y=VB.week.Nest),color = "black")+
+  geom_path(data=pop.est.3,aes(y=VB.week.Nest),color = "black")+ 
+  geom_path(data=pop.est.3,aes(y=(VB.week.Nest+VB.week.Nest.se)),color = "black", linetype="dashed")+
+  geom_path(data=pop.est.3,aes(y=(VB.week.Nest-VB.week.Nest.se)),color = "black",linetype="dashed")+
+  geom_path(data=pop.est.4,aes(y=VB.avr.Nest),color = "darkgrey")+
+  geom_point(data=pop.est.4,aes(y=VB.avr.Nest),color = "darkgrey", shape=2)+
+  geom_path(data=pop.est.4,aes(y=(VB.avr.Nest+VB.avr.Nest.se)),color = "darkgrey", linetype="dashed")+
+  geom_path(data=pop.est.4,aes(y=(VB.avr.Nest-VB.avr.Nest.se)),color = "darkgrey",linetype="dashed")+
+  scale_y_continuous(breaks=seq(0,800,100), limits = c(0, 800))+
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-12-15")))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Estimated number of larvae", x="Month")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+e2
+
+
+
+pop.est.5<-subset(pop.est, MB.week.Nest!="NA")
+pop.est.6<-subset(pop.est, MB.avr.Nest!="NA")
+e3<-ggplot(pop.est, aes(x=date), y=MB.week.Nest,) +
+  ggtitle("Stream MB")+
+  geom_ribbon(data=pop.est.5,aes(x=date, ymax=(MB.week.Nest+MB.week.Nest.se), 
+                                 ymin=(MB.week.Nest-MB.week.Nest.se), alpha=.3), fill="black")+ 
+  geom_ribbon(data=pop.est.6,aes(x=date, ymax=(MB.avr.Nest+MB.avr.Nest.se), 
+                                 ymin=(MB.avr.Nest-MB.avr.Nest.se), alpha=.3), fill="darkgrey")+ 
+  geom_point(data=pop.est.5,aes(y=MB.week.Nest),color = "black")+
+  geom_path(data=pop.est.5,aes(y=MB.week.Nest),color = "black")+ 
+  geom_path(data=pop.est.5,aes(y=(MB.week.Nest+MB.week.Nest.se)),color = "black", linetype="dashed")+
+  geom_path(data=pop.est.5,aes(y=(MB.week.Nest-MB.week.Nest.se)),color = "black",linetype="dashed")+
+  geom_path(data=pop.est.6,aes(y=MB.avr.Nest),color = "darkgrey")+
+  geom_point(data=pop.est.6,aes(y=MB.avr.Nest),color = "darkgrey", shape=2)+
+  geom_path(data=pop.est.6,aes(y=(MB.avr.Nest+MB.avr.Nest.se)),color = "darkgrey", linetype="dashed")+
+  geom_path(data=pop.est.6,aes(y=(MB.avr.Nest-MB.avr.Nest.se)),color = "darkgrey",linetype="dashed")+
+  scale_y_continuous(breaks=seq(0,800,100), limits = c(0, 800))+
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-12-15")))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Estimated number of larvae", x="Month")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+e3
+
+pop.est.7<-subset(pop.est, KoB.week.Nest!="NA")
+pop.est.7<-subset(pop.est, KoB.avr.Nest!="NA")
+e4<-ggplot(pop.est, aes(x=date), y=KoB.week.Nest,) +
+  ggtitle("(Stream) KoB")+
+  geom_ribbon(data=pop.est.7,aes(x=date, ymax=(KoB.week.Nest+KoB.week.Nest.se), 
+                                 ymin=(KoB.week.Nest-KoB.week.Nest.se), alpha=.3), fill="black")+ 
+  geom_ribbon(data=pop.est.7,aes(x=date, ymax=(KoB.avr.Nest+KoB.avr.Nest.se), 
+                                 ymin=(KoB.avr.Nest-KoB.avr.Nest.se), alpha=.3), fill="lightgrey")+ 
+  geom_point(data=pop.est.7,aes(y=KoB.week.Nest),color = "black")+
+  geom_path(data=pop.est.7,aes(y=KoB.week.Nest),color = "black")+ 
+  geom_path(data=pop.est.7,aes(y=(KoB.week.Nest+KoB.week.Nest.se)),color = "black", linetype="dashed")+
+  geom_path(data=pop.est.7,aes(y=(KoB.week.Nest-KoB.week.Nest.se)),color = "black",linetype="dashed")+
+  geom_path(data=pop.est.7,aes(y=KoB.avr.Nest),color = "darkgrey")+
+  geom_point(data=pop.est.7,aes(y=KoB.avr.Nest),color = "darkgrey", shape=2)+
+  geom_path(data=pop.est.7,aes(y=(KoB.avr.Nest+KoB.avr.Nest.se)),color = "darkgrey", linetype="dashed")+
+  geom_path(data=pop.est.7,aes(y=(KoB.avr.Nest-KoB.avr.Nest.se)),color = "darkgrey",linetype="dashed")+
+  scale_y_continuous(breaks=seq(0,800,100), limits = c(0, 800))+
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-12-15")))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Estimated number of larvae", x="Month")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+e4
+
+pop.est.9<-subset(pop.est, KoVK.week.Nest!="NA")
+pop.est.10<-subset(pop.est, KoVK.avr.Nest!="NA")
+e5<-ggplot(pop.est, aes(x=date), y=KoVK.week.Nest,) +
+  ggtitle("Pond KoVK")+
+  geom_ribbon(data=pop.est.9,aes(x=date, ymax=(KoVK.week.Nest+KoVK.week.Nest.se), 
+                                 ymin=(KoVK.week.Nest-KoVK.week.Nest.se), alpha=.3), fill="black")+ 
+  geom_ribbon(data=pop.est.10,aes(x=date, ymax=(KoVK.avr.Nest+KoVK.avr.Nest.se), 
+                                  ymin=(KoVK.avr.Nest-KoVK.avr.Nest.se), alpha=.3), fill="darkgrey")+ 
+  geom_point(data=pop.est.9,aes(y=KoVK.week.Nest),color = "black")+
+  geom_path(data=pop.est.9,aes(y=KoVK.week.Nest),color = "black")+ 
+  geom_path(data=pop.est.9,aes(y=(KoVK.week.Nest+KoVK.week.Nest.se)),color = "black", linetype="dashed")+
+  geom_path(data=pop.est.9,aes(y=(KoVK.week.Nest-KoVK.week.Nest.se)),color = "black",linetype="dashed")+
+  geom_path(data=pop.est.10,aes(y=KoVK.avr.Nest),color = "darkgrey")+
+  geom_point(data=pop.est.10,aes(y=KoVK.avr.Nest),color = "darkgrey", shape=2)+
+  geom_path(data=pop.est.10,aes(y=(KoVK.avr.Nest+KoVK.avr.Nest.se)),color = "darkgrey", linetype="dashed")+
+  geom_path(data=pop.est.10,aes(y=(KoVK.avr.Nest-KoVK.avr.Nest.se)),color = "darkgrey",linetype="dashed")+
+  scale_y_continuous(breaks=seq(0,2100,500), limits = c(0, 2100))+
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-12-15")))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Estimated number of larvae", x="Month")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+e5
+
+
+
+pop.est.11<-subset(pop.est, TG.week.Nest!="NA")
+pop.est.12<-subset(pop.est, TG.avr.Nest!="NA")
+e6<-ggplot(pop.est, aes(x=date), y=TG.week.Nest,) +
+  ggtitle("Pond TG")+
+  geom_ribbon(data=pop.est.11,aes(x=date, ymax=(TG.week.Nest+TG.week.Nest.se), 
+                                  ymin=(TG.week.Nest-TG.week.Nest.se), alpha=.3), fill="black")+ 
+  geom_ribbon(data=pop.est.12,aes(x=date, ymax=(TG.avr.Nest+TG.avr.Nest.se), 
+                                  ymin=(TG.avr.Nest-TG.avr.Nest.se), alpha=.3), fill="darkgrey")+ 
+  geom_point(data=pop.est.11,aes(y=TG.week.Nest),color = "black")+
+  geom_path(data=pop.est.11,aes(y=TG.week.Nest),color = "black")+ 
+  geom_path(data=pop.est.11,aes(y=(TG.week.Nest+TG.week.Nest.se)),color = "black", linetype="dashed")+
+  geom_path(data=pop.est.11,aes(y=(TG.week.Nest-TG.week.Nest.se)),color = "black",linetype="dashed")+
+  geom_path(data=pop.est.12,aes(y=TG.avr.Nest),color = "darkgrey")+
+  geom_point(data=pop.est.12,aes(y=TG.avr.Nest),color = "darkgrey", shape=2)+
+  geom_path(data=pop.est.12,aes(y=(TG.avr.Nest+TG.avr.Nest.se)),color = "darkgrey", linetype="dashed")+
+  geom_path(data=pop.est.12,aes(y=(TG.avr.Nest-TG.avr.Nest.se)),color = "darkgrey",linetype="dashed")+
+  scale_y_continuous(breaks=seq(0,2100,500), limits = c(0, 2100))+
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-12-15")))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Estimated number of larvae", x="Month")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+e6
+
+
+
+pop.est.13<-subset(pop.est, SG.week.Nest!="NA")
+pop.est.14<-subset(pop.est, SG.avr.Nest!="NA")
+e7<-ggplot(pop.est, aes(x=date), y=SG.week.Nest,) +
+  ggtitle("Pond SG")+
+  geom_ribbon(data=pop.est.13,aes(x=date, ymax=(SG.week.Nest+SG.week.Nest.se), 
+                                  ymin=(SG.week.Nest-SG.week.Nest.se), alpha=.3), fill="black")+ 
+  geom_ribbon(data=pop.est.14,aes(x=date, ymax=(SG.avr.Nest+SG.avr.Nest.se), 
+                                  ymin=(SG.avr.Nest-SG.avr.Nest.se), alpha=.3), fill="darkgrey")+ 
+  geom_point(data=pop.est.13,aes(y=SG.week.Nest),color = "black")+
+  geom_path(data=pop.est.13,aes(y=SG.week.Nest),color = "black")+ 
+  geom_path(data=pop.est.13,aes(y=(SG.week.Nest+SG.week.Nest.se)),color = "black", linetype="dashed")+
+  geom_path(data=pop.est.13,aes(y=(SG.week.Nest-SG.week.Nest.se)),color = "black",linetype="dashed")+
+  geom_path(data=pop.est.14,aes(y=SG.avr.Nest),color = "darkgrey")+
+  geom_point(data=pop.est.14,aes(y=SG.avr.Nest),color = "darkgrey", shape=2)+
+  geom_path(data=pop.est.14,aes(y=(SG.avr.Nest+SG.avr.Nest.se)),color = "darkgrey", linetype="dashed")+
+  geom_path(data=pop.est.14,aes(y=(SG.avr.Nest-SG.avr.Nest.se)),color = "darkgrey",linetype="dashed")+
+  scale_y_continuous(breaks=seq(0,2100,500), limits = c(0, 2100))+
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-12-15")))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Estimated number of larvae", x="Month")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+e7
+
+
+
+pop.est.15<-subset(pop.est, TT.week.Nest!="NA")
+pop.est.16<-subset(pop.est, TT.avr.Nest!="NA")
+e8<-ggplot(pop.est, aes(x=date), y=TT.week.Nest,) +
+  ggtitle("Pond TT")+
+  geom_ribbon(data=pop.est.15,aes(x=date, ymax=(TT.week.Nest+TT.week.Nest.se), 
+                                  ymin=(TT.week.Nest-TT.week.Nest.se), alpha=.3), fill="black")+ 
+  geom_ribbon(data=pop.est.16,aes(x=date, ymax=(TT.avr.Nest+TT.avr.Nest.se), 
+                                  ymin=(TT.avr.Nest-TT.avr.Nest.se), alpha=.3), fill="darkgrey")+ 
+  geom_point(data=pop.est.15,aes(y=TT.week.Nest),color = "black")+
+  geom_path(data=pop.est.15,aes(y=TT.week.Nest),color = "black")+ 
+  geom_path(data=pop.est.15,aes(y=(TT.week.Nest+TT.week.Nest.se)),color = "black", linetype="dashed")+
+  geom_path(data=pop.est.15,aes(y=(TT.week.Nest-TT.week.Nest.se)),color = "black",linetype="dashed")+
+  geom_path(data=pop.est.16,aes(y=TT.avr.Nest),color = "darkgrey")+
+  geom_point(data=pop.est.16,aes(y=TT.avr.Nest),color = "darkgrey", shape=2)+
+  geom_path(data=pop.est.16,aes(y=(TT.avr.Nest+TT.avr.Nest.se)),color = "darkgrey", linetype="dashed")+
+  geom_path(data=pop.est.16,aes(y=(TT.avr.Nest-TT.avr.Nest.se)),color = "darkgrey",linetype="dashed")+
+  scale_y_continuous(breaks=seq(0,2100,500), limits = c(0, 2100))+
+  scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-12-15")))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Estimated number of larvae", x="Month")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none",
+        axis.title.x=element_blank(),)
+e8
+
+# get legend
+# make plot only for legend
+legend5<-ggplot(pop.est, aes(x=date), y=KoVK.week.n, group=as.factor(period), colour=as.factor(period),shape=as.factor(period))+
+  ggtitle("only to grab legend")+ 
+  geom_line(aes(y=KoVK.week.n,color=as.factor(period)), size=0.5)+
+  geom_point(aes(y=KoVK.week.n,color=as.factor(period), shape=as.factor(period)))+ 
+  scale_shape_manual(values=c(2,16))+
+  scale_color_manual(values=c("darkgrey", "black"))+
+  theme_classic(base_size=12, base_family="Arial")+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="bottom",
+        legend.title=element_blank(),
+        axis.title.x=element_blank(),)
+
+
+get_only_legend <- function(plot) {
+  plot_table <- ggplot_gtable(ggplot_build(plot))
+  legend_plot <- which(sapply(plot_table$grobs, function(x) x$name) == "guide-box")
+  legend <- plot_table$grobs[[legend_plot]]
+  return(legend)
+}
+
+legend5a<- get_only_legend(legend5)
+
+# 2.1.2 ARRANGE MARGINS OF PLOTS 
+me1<-e1+
+  theme(plot.margin = unit(c(0.55,0,0.7,0.9), "cm"),
+        plot.title=element_blank(),
+        axis.title.y=element_blank(),
+        axis.title.x=element_blank(),
+        axis.text.x=element_blank())
+
+me2<-e2+
+  theme(plot.margin = unit(c(0.55,0.25,0.7,0.45), "cm"),
+        plot.title=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_blank())
+
+me3<-e3+
+  theme(plot.margin = unit(c(0.55,0.3,0.7,0.25), "cm"),
+        plot.title=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_blank())
+
+me4<-e4+
+  theme(plot.margin = unit(c(0.55,0.75,0.7,0.2), "cm"),
+        plot.title=element_blank(),
+        axis.title.x=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_blank())
+
+me5<-e5+
+  theme(plot.margin = unit(c(0.2,0,1.2,0.7), "cm"),
+        axis.title.y=element_blank(),
+        plot.title=element_blank(),
+        axis.text.x=element_blank())
+
+me6<-e6+
+  theme(plot.margin = unit(c(0.2,0.25,1.2,0.45), "cm"),
+        plot.title=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_blank())
+
+me7<-e7+
+  theme(plot.margin = unit(c(0.2,0.3,1.2,0.25), "cm"),
+        plot.title=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_blank())
+
+me8<-e8+
+  theme(plot.margin = unit(c(0.2,0.75,1.2,0.2), "cm"),
+        plot.title=element_blank(),
+        axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.text.x=element_blank(),
+        legend.position = "none")
+
+
+############### 2.1.3 CREATE MULTIPLOT
+library(gridExtra)
+library(grid)
+
+Multiplot5<-grid.arrange(me1, me2,me3,me4,me5,me6,me7,me8, ncol=4)
+Multiplot5a<-grid.arrange(Multiplot5, legend5a, ncol=1, heights = c(10, 1))
+grid.text("Stream KB", x = unit(0.16, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Stream VB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Stream MB", x = unit(0.63, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("(Stream) KoB", x = unit(0.86, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Pond KoVK", x = unit(0.16, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Pond TG", x = unit(0.375, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Pond SG", x = unit(0.63, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Pond TT", x = unit(0.86, "npc"), y = unit(0.53, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.099, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.114, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.129, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.143, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.157, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.173, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("S", x = unit(0.19, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("O", x = unit(0.205, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("N", x = unit(0.22, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("D", x = unit(0.235, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.287, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.307, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.327, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.347, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.367, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.387, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("S", x = unit(0.407, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("O", x = unit(0.427, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("N", x = unit(0.448, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("D", x = unit(0.468, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.526, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.548, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.57, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.588, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.607, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.632, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("S", x = unit(0.654, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("O", x = unit(0.675, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("N", x = unit(0.695, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("D", x = unit(0.717, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.775, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.794, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.813, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.83, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.85, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.87, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("S", x = unit(0.889, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("O", x = unit(0.908, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("N", x = unit(0.927, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("D", x = unit(0.946, "npc"), y = unit(0.575, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.099, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.114, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.129, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.143, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.157, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.173, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("S", x = unit(0.19, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("O", x = unit(0.205, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("N", x = unit(0.22, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("D", x = unit(0.235, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.287, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.307, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.327, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.347, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.367, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.387, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("S", x = unit(0.407, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("O", x = unit(0.427, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("N", x = unit(0.448, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("D", x = unit(0.468, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.526, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.548, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.57, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.588, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.607, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.632, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("S", x = unit(0.654, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("O", x = unit(0.675, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("N", x = unit(0.695, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("D", x = unit(0.717, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.775, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.794, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("M", x = unit(0.813, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.83, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("J", x = unit(0.85, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("A", x = unit(0.87, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("S", x = unit(0.889, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("O", x = unit(0.908, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("N", x = unit(0.927, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("D", x = unit(0.946, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Month", x = unit(0.51, "npc"), y = unit(0.11, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Estimated number of larvae", x = unit(0.013, "npc"), y = unit(0.35, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("Estimated number of larvae", x = unit(0.013, "npc"), y = unit(0.79, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
