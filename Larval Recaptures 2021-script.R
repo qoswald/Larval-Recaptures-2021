@@ -16,8 +16,8 @@ library(magrittr) # for pipes
 library(RMark)
 MarkPath="D:/UniBieProgramme/MARK" # set path to were the Mark pogram is saved on your computer
 
-## ponds
-# KoVK 
+########## ponds
+##### KoVK 
 # based on weekly averages
 # upload and manipulate data
 KoVK=read.delim("KoVK.txt",colClass=c("character","character"))
@@ -61,7 +61,314 @@ KoVK.models
 summary(KoVK.models[[2]], se=TRUE)
 KoVK.models[[2]]$results$derived
 
+##### SG
+# based on weekly averages
+# upload and manipulate data
+SG=read.delim("SG.txt",colClass=c("character","character"))
+SGmut <- mutate(SG, across(c(ID), as.factor))
+str(SGmut)
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+SG.matrix <- SGmut$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(SGmut))
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(SG.matrix, rep(1,nrow(SGmut)))
+# if p>0.05 no evidence for lack of fit
+# process data
+SG.proc <- process.data(SGmut, model = "POPAN")
+# Smake design data (from processed data)
+SG.dd <- make.design.data(SG.proc)
+fit.SG.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = SG.proc, ddl = SG.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)}
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
+# Run functions
+SG.models <- fit.SG.model()
+SG.models
+summary(SG.models[[2]], se=TRUE)
+SG.models[[2]]$results$derived
 
+##### TG
+# based on weekly averages
+# upload and manipulate data
+TG=read.delim("TG.txt",colClass=c("character","character"))
+TGmut <- mutate(TG, across(c(ID), as.factor))
+str(TGmut)
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+TG.matrix <- TGmut$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(TGmut))
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(TG.matrix, rep(1,nrow(TGmut)))
+# if p>0.05 no evidence for lack of fit
+# process data
+TG.proc <- process.data(TGmut, model = "POPAN")
+# Smake design data (from processed data)
+TG.dd <- make.design.data(TG.proc)
+fit.TG.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = TG.proc, ddl = TG.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)}
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
+# Run functions
+TG.models <- fit.TG.model()
+TG.models
+summary(TG.models[[2]], se=TRUE)
+TG.models[[2]]$results$derived
+
+##### TT
+# based on weekly averages
+# upload and manipulate data
+TT=read.delim("TT.txt",colClass=c("character","character"))
+TTmut <- mutate(TT, across(c(ID), as.factor))
+str(TTmut)
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+TT.matrix <- TTmut$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(TTmut))
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(TT.matrix, rep(1,nrow(TTmut)))
+# if p>0.05 no evidence for lack of fit
+# process data
+TT.proc <- process.data(TTmut, model = "POPAN")
+# Smake design data (from processed data)
+TT.dd <- make.design.data(TT.proc)
+fit.TT.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = TT.proc, ddl = TT.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)}
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
+# Run functions
+TT.models <- fit.TT.model()
+TT.models
+summary(TT.models[[2]], se=TRUE)
+TT.models[[2]]$results$derived
+
+#########+ streams
+##### KB
+# based on weekly averages
+# upload and manipulate data
+KB=read.delim("KB.txt",colClass=c("character","character"))
+KBmut <- mutate(KB, across(c(ID), as.factor))
+str(KBmut)
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+KB.matrix <- KBmut$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(KBmut))
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(KB.matrix, rep(1,nrow(KBmut)))
+# if p>0.05 no evidence for lack of fit
+# process data
+KB.proc <- process.data(KBmut, model = "POPAN")
+# Smake design data (from processed data)
+KB.dd <- make.design.data(KB.proc)
+fit.KB.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = KB.proc, ddl = KB.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)}
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
+# Run functions
+KB.models <- fit.KB.model()
+KB.models
+summary(KB.models[[2]], se=TRUE)
+KB.models[[2]]$results$derived
+
+##### KoB
+# based on weekly averages
+# upload and manipulate data
+KoB=read.delim("KoB.txt",colClass=c("character","character"))
+KoBmut <- mutate(KoB, across(c(ID), as.factor))
+str(KoBmut)
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+KoB.matrix <- KoBmut$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(KoBmut))
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(KoB.matrix, rep(1,nrow(KoBmut)))
+# if p>0.05 no evidence for lack of fit
+# process data
+KoB.proc <- process.data(KoBmut, model = "POPAN")
+# Smake design data (from processed data)
+KoB.dd <- make.design.data(KoB.proc)
+fit.KoB.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = KoB.proc, ddl = KoB.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)}
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
+# Run functions
+KoB.models <- fit.KoB.model()
+KoB.models
+summary(KoB.models[[2]], se=TRUE)
+KoB.models[[2]]$results$derived
+
+##### MB
+# based on weekly averages
+# upload and manipulate data
+MB=read.delim("MB.txt",colClass=c("character","character"))
+MBmut <- mutate(MB, across(c(ID), as.factor))
+str(MBmut)
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+MB.matrix <- MBmut$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(MBmut))
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(MB.matrix, rep(1,nrow(MBmut)))
+# if p>0.05 no evidence for lack of fit
+# process data
+MB.proc <- process.data(MBmut, model = "POPAN")
+# Smake design data (from processed data)
+MB.dd <- make.design.data(MB.proc)
+fit.MB.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = MB.proc, ddl = MB.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)}
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
+# Run functions
+MB.models <- fit.MB.model()
+MB.models
+summary(MB.models[[2]], se=TRUE)
+MB.models[[2]]$results$derived
+
+##### VB
+# based on weekly averages
+# upload and manipulate data
+VB=read.delim("VB.txt",colClass=c("character","character"))
+VBmut <- mutate(VB, across(c(ID), as.factor))
+str(VBmut)
+# first we have to turn our data into a matrix that is needed to work with R2ucare
+VB.matrix <- VBmut$ch %>%
+  strsplit('') %>%
+  sapply(`[`) %>%
+  t() %>%
+  unlist() %>%
+  as.numeric %>%
+  matrix(nrow = nrow(VBmut))
+# now have a look at the goodness of fit, i.e. if the assumptions of equal capture probabilities and survival are correct
+overall_CJS(VB.matrix, rep(1,nrow(VBmut)))
+# if p>0.05 no evidence for lack of fit
+# process data
+VB.proc <- process.data(VBmut, model = "POPAN")
+# Smake design data (from processed data)
+VB.dd <- make.design.data(VB.proc)
+fit.VB.model <- function(){
+  # Phi formulas
+  Phi.dot <- list(formula=~1)
+  Phi.time <- list(formula=~time)
+  # p formulas
+  p.dot <- list(formula=~1)
+  # pent formulas
+  pent.time <- list(formula=~-1+time)
+  pent.dot <- list(formula=~1)
+  # Nsuper formulas
+  N.dot <- list(formula=~1)
+  cml <- create.model.list("POPAN")
+  results <- mark.wrapper(cml, data = VB.proc, ddl = VB.dd,
+                          external = FALSE, accumulate = FALSE, hessian = TRUE)
+  return(results)}
+# set directory where Mark-ouptut is saved
+setwd("D:/Mark_output")
+# Run functions
+VB.models <- fit.VB.model()
+VB.models
+summary(VB.models[[2]], se=TRUE)
+VB.models[[2]]$results$derived
 
 
 ####################################################################################################################################################################################################
