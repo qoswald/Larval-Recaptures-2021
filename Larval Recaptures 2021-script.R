@@ -1246,7 +1246,7 @@ glmmTMB(on.ind~habitat+water.temp+(1|ID)+(1|timespan),data=ind.transformed)
 AIC(mind0,mind1,mind2,mind3,mind4,mind5,mind6) # mind1 best supported
 compare_performance(mind0,mind1,mind2,mind3,mind4,mind5,mind6, rank = T) # mind1 and mind6 equally supported
 
-check_model(mind1)
+check_model(mind1) # looks okay and supported by both methods, take this
 check_model(mind6)
 summary(mind1)
 summary(mind6)
