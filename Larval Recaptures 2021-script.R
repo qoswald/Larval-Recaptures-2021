@@ -1245,6 +1245,7 @@ AIC(mind0,mind1,mind2,mind3,mind4,mind5,mind6) # mind1 best supported
 compare_performance(mind0,mind1,mind2,mind3,mind4,mind5,mind6, rank = T) # mind1 and mind6 equally supported
 
 check_model(mind1)
+check_model(mind6)
 summary(mind1)
 summary(mind6)
 
@@ -1351,7 +1352,6 @@ library(ResourceSelection)
 mod1<-glm(perc.injured~habitat, data=inj.sub, family=poisson(link="log"))
 mod2<-lm(perc.injured~habitat, data=inj.sub)
 check_distribution(mod1)
-hoslem.test(inj.dat.omit$perc.injured, fitted(mod1)) # goodness of fit test
 check_model(mod1)
 check_model(mod2)
 
@@ -1365,7 +1365,7 @@ plot(mod2.res)
 testDispersion(mod2) 
 
 # still doesn't look good, use simple non-parametric test (Wilcoxon)
-# implemented in the following
+# implemented in the following plot
 
 
 # plot percentage of injured larvae across all years and sample sites
@@ -1394,6 +1394,128 @@ setwd("D:/Plots/Mark_recapture")
 png("injuries.png", height=150, width=200, units="mm", res=300);print(injuries)
 dev.off()
 
+
+
+####################################################################################################################################################################################################
+
+# 7. RECAPTURE RATES
+
+# import rawdata
+library(readxl)
+recap.surv <- read_excel("recapture<-survival.xlsx", na="NA",
+                      col_types = c("text", "text", ,"numeric","date","numeric","text","numeric",
+                                    "numeric","numeric","numeric","text")) 
+
+## set categories
+library(dplyr)
+recap. <- mutate(recap.surv, across(c(sample.site:habitat), as.factor))
+str(recap.)
+
+# prepare and inspect data
+recap.sub<-subset(recap., sample.site!="KoB")
+hist(recap.sub$r)
+
+## find best transformation for data
+# first, create objects with the transformations, e.g. logarithm etc.
+library(bestNormalize)
+(arcsinh_recap <- arcsinh_x(recap.sub$r))
+(boxcox_recap <- boxcox(recap.sub$r))
+(centerscale_recap <- center_scale(recap.sub$r))
+(orderNorm_recap <- orderNorm(recap.sub$r))
+(yeojohnson_recap <- yeojohnson(recap.sub$r))
+(sqrt_recap <- sqrt(recap.sub$r))
+(log_recap <- log(recap.sub$r))
+
+# then have a look at the histograms of the different transformations for first impression
+par(mfrow = c(2,4)) # display all histograms in one window
+hist(recap.sub$r)
+MASS::truehist(arcsinh_recap$x.t, main = "Arcsinh transformation", nbins = 12) # x.t stands for the transformed variable
+MASS::truehist(boxcox_recap$x.t, main = "Box Cox transformation", nbins = 12)
+MASS::truehist(centerscale_recap$x.t, main = "center_scale transformation", nbins = 12)
+MASS::truehist(orderNorm_recap$x.t, main = "orderNorm transformation", nbins = 12)
+MASS::truehist(yeojohnson_recap$x.t, main = "Yeo-Johnson transformation", nbins = 12)
+MASS::truehist(sqrt_recap, main = "squareroot transformation", nbins = 12)
+MASS::truehist(log_recap, main = "log transformation", nbins = 12)
+
+# let R recommend the most suitable transformation method
+bn.recap<-bestNormalize(recap.sub$r, out_of_sample = FALSE) 
+bn.recap
+
+## create an object for the best transformation
+arc.recap <- arcsinh_recap$x.t # ordernorm transformation
+
+## add the new object as column to your data frame
+recap.transformed <- cbind(recap.sub, arc.recap)
+str(recap.transformed)
+hist(recap.transformed$arc.recap)
+
+## test for normal distribution and homogeneity of variance of the transformed variable
+shapiro.test(recap.transformed$arc.recap) 
+var.test(recap.transformed$arc.recap ~ recap.transformed$habitat) 
+
+# transformation did not normalise data
+# use other distribution?
+library(performance)
+library(ResourceSelection)
+library(lme4)
+library(lmerTest)
+
+mod3<-glm(r~habitat, data=recap.sub, family=poisson(link="log"))
+mod4<-lm(r~habitat, data=recap.sub)
+check_distribution(mod3)
+check_distribution(mod4)
+check_model(mod3)
+check_model(mod4)
+
+# Check Model Residuals
+library(DHARMa)
+mod3.res<- simulateResiduals(mod3)
+plot(mod3.res) 
+testDispersion(mod3) # not good
+mod4.res<- simulateResiduals(mod4)
+plot(mod4.res)
+testDispersion(mod4) # okay
+
+# mod 4 looks okay, maybe linear model is okay
+
+# set up models
+mrecap0<-lm(r~habitat,data=recap.sub)
+mrecap1<-lmer(r~habitat + (1|sample.site),data=recap.sub)
+mrecap2<-lmer(r~habitat+(1|occasion),data=recap.sub)
+mrecap3<-lmer(r~habitat+(1|sample.site)+(1|occasion),data=recap.sub)
+AIC(mrecap0, mrecap1, mrecap2, mrecap3) # mrecap0 most supported
+compare_performance(mrecap0, mrecap1, mrecap2, mrecap3, rank = T) # mrecap3 most supported
+summary(mrecap0)
+summary(mrecap3)
+check_model(mrecap0)
+check_model(mrecap3) # this model looks better than mrecap0, take this
+
+
+
+# plot recapture rates per habitat
+
+library(plyr)
+library(ggplot2)
+library(ggpubr) 
+count(recap.sub, "habitat")
+
+recaptures<-
+  ggplot(data=recap.sub, aes(habitat,r), fill=habitat)+
+  geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
+  geom_jitter(aes(fill=habitat), shape=21)+
+  scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(x="Habitat type", y="Rrecapture rate")+
+  scale_y_continuous(breaks=seq(0,1,0.25), limits = c(0, 1))+
+  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
+        axis.text.y=element_text(family="Arial", size=12, color="black"),
+        legend.position="none")
+
+setwd("D:/Plots/Mark_recapture")
+png("recaptures.png", height=150, width=200, units="mm", res=300);print(recaptures)
+dev.off()
 
 
 
