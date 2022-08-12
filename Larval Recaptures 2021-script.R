@@ -755,8 +755,8 @@ figp<-p8+
 library(gridExtra)
 library(grid)
 setwd("D:/Plots/Mark_recapture")
-png("multiplot-count.png", height=150, width=200, units="mm", res=300);print(Multiplot1)
 Multiplot1<-grid.arrange(figi, figj, figk, figl, figm, fign, figo, figp, ncol=4)
+png("multiplot-count.png", height=150, width=200, units="mm", res=300);print(Multiplot1)
 Multiplot1a<-grid.arrange(Multiplot1, legend1, ncol=1, heights = c(10, 1))
 grid.text("Stream KB", x = unit(0.16, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Stream VB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
@@ -1106,8 +1106,8 @@ fps8<-ps8+
 library(gridExtra)
 library(grid)
 setwd("D:/Plots/Mark_recapture")
-png("multiplot-meansize.png", height=150, width=200, units="mm", res=300);print(Multiplot2)
 Multiplot2<-grid.arrange(fps1, fps2, fps3, fps4, fps5, fps6, fps7, fps8, ncol=4)
+png("multiplot-meansize.png", height=150, width=200, units="mm", res=300);print(Multiplot2)
 Multiplot2a<-grid.arrange(Multiplot2, legend2, ncol=1, heights = c(10, 1))
 grid.text("Stream KB", x = unit(0.155, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Stream VB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
@@ -1743,7 +1743,7 @@ png("estimatedpopsize.png", height=150, width=200, units="mm", res=300);print(es
 dev.off()
 
 
-# plot single plots for each sample sites
+# plot single plots for each sample site
 library(readr)
 library(ggplot2)
 pop.est <- read_delim("pop-est-larvae_allinone.csv", delim = ";")
@@ -2051,8 +2051,9 @@ me8<-e8+
 ############### 2.1.3 CREATE MULTIPLOT
 library(gridExtra)
 library(grid)
-
+setwd("D:/Plots/Mark_recapture")
 Multiplot5<-grid.arrange(me1, me2,me3,me4,me5,me6,me7,me8, ncol=4)
+png("multiplot-popest.png", height=150, width=200, units="mm", res=300);print(Multiplot5)
 Multiplot5a<-grid.arrange(Multiplot5, legend5a, ncol=1, heights = c(10, 1))
 grid.text("Stream KB", x = unit(0.16, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Stream VB", x = unit(0.375, "npc"), y = unit(0.97, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
@@ -2145,3 +2146,4 @@ grid.text("D", x = unit(0.946, "npc"), y = unit(0.15, "npc"), gp=gpar(fontfamily
 grid.text("Month", x = unit(0.51, "npc"), y = unit(0.11, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Estimated number of larvae", x = unit(0.013, "npc"), y = unit(0.35, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
 grid.text("Estimated number of larvae", x = unit(0.013, "npc"), y = unit(0.79, "npc"), rot=90, gp=gpar(fontfamily="Arial", fontsize=12))
+dev.off()
