@@ -894,18 +894,19 @@ compare_performance(msize0,msize1, msize2, rank = T) # msize2 best performance s
 # plot mean larval size as boxplot over all years and all sample sites
 library(plyr)
 library(ggpubr) 
-count(overall.dat, "habitat")
-hist(overall.dat$mean.size)
-shapiro.test(overall.dat$mean.size) # non-normal
-var.test(overall.dat$mean.size ~ overall.dat$habitat) #okay
+count(mean.sub, "habitat")
+hist(mean.sub$mean.size)
+shapiro.test(mean.sub$mean.size) # non-normal
+var.test(mean.sub$mean.size ~ mean.sub$habitat) #okay
 
 sizeplot<-
-  ggplot(data=overall.dat, aes(habitat,mean.size), fill=habitat)+
+  ggplot(data=mean.sub, aes(habitat,mean.size), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  annotate("text", x = 1.5, y =5, label = "n.s.")+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
-  scale_x_discrete(labels=c("Pond (N=57)","Stream (N=61)"))+
+  scale_x_discrete(labels=c("Pond (N=88)","Stream (N=66)"))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(x="Habitat type", y="Mean larval size (cm)")+
   scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
@@ -1264,6 +1265,10 @@ count(ind.dat.2, "notes")
 growtha<-subset(ind.dat.2, notes!="ssf"| is.na(notes))
 growth<-subset(growtha, sample.site!="KoB") # remove KoB, since it's in between pond and stream
 count(growth, "habitat")
+aggregate(growth$daily.growth.rate, by = list(growth$habitat), max)
+aggregate(growth$daily.growth.rate, by = list(growth$habitat), min)
+aggregate(growth$daily.growth.rate, by = list(growth$habitat), mean, na.rm = TRUE)
+
 hist(growth$daily.growth.rate)
 shapiro.test(growth$daily.growth.rate) # non-normal
 var.test(growth$daily.growth.rate ~ growth$habitat) #okay
@@ -1274,6 +1279,7 @@ growthplot<-
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  annotate("text", x = 1.5, y = 0.065, label = "*")+
   scale_x_discrete(labels=c("Pond (N=63)","Stream (N=65)"))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(x="Habitat type", y="Daily growth rate (cm)")+
@@ -1373,6 +1379,9 @@ library(plyr)
 library(ggplot2)
 library(ggpubr) 
 count(inj.sub, "habitat")
+aggregate(inj.sub$perc.injured, by = list(inj.sub$habitat), max, na.rm = TRUE)
+aggregate(inj.sub$perc.injured, by = list(inj.sub$habitat), min, na.rm = TRUE)
+aggregate(inj.sub$perc.injured, by = list(inj.sub$habitat), mean, na.rm = TRUE)
 
 injuries<-
   ggplot(data=inj.sub, aes(habitat,perc.injured), fill=habitat)+
@@ -1383,7 +1392,7 @@ injuries<-
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond (N=88)","Stream (N=66)"))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(x="Habitat type", y="Rate of injured larvae")+
+  labs(x="Habitat type", y="Percentage of injured larvae")+
   scale_y_continuous(breaks=seq(0,1,0.25), limits = c(0, 1))+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
@@ -1492,6 +1501,9 @@ library(plyr)
 library(ggplot2)
 library(ggpubr) 
 count(recap.sub, "habitat")
+aggregate(recap.sub$r, by = list(recap.sub$habitat), max, na.rm = TRUE)
+aggregate(recap.sub$r, by = list(recap.sub$habitat), min, na.rm = TRUE)
+
 
 recaptures<-
   ggplot(data=recap.sub, aes(habitat,r), fill=habitat)+
@@ -1499,6 +1511,7 @@ recaptures<-
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  annotate("text", x = 1.5, y = 1, label = "n.s.")+
   scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(x="Habitat type", y="Recapture rate")+
@@ -1598,12 +1611,16 @@ library(plyr)
 library(ggplot2)
 library(ggpubr) 
 count(surv.sub, "habitat")
+aggregate(surv.sub$phi, by = list(surv.sub$habitat), max, na.rm = TRUE)
+aggregate(surv.sub$phi, by = list(surv.sub$habitat), min, na.rm = TRUE)
+aggregate(surv.sub$phi, by = list(surv.sub$habitat), mean, na.rm = TRUE)
 
 survival<-
   ggplot(data=surv.sub, aes(habitat,phi), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  stat_compare_means(method="wilcox.test", label="p.signif",  label.x = 1.5, label.y = 1)+ # pvalue=0.034
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
   theme_classic(base_size=12, base_family="Arial")+
@@ -1713,12 +1730,16 @@ library(plyr)
 library(ggplot2)
 library(ggpubr) 
 count(nest.sub, "habitat")
+aggregate(nest.sub$Nest, by = list(surv.sub$habitat), max, na.rm = TRUE)
+aggregate(nest.sub$Nest, by = list(surv.sub$habitat), min, na.rm = TRUE)
+aggregate(nest.sub$Nest, by = list(surv.sub$habitat), mean, na.rm = TRUE)
 
 estimates<-
   ggplot(data=nest.sub, aes(habitat,Nest), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
+  annotate("text", x = 1.5, y = 1500, label = "n.s.")+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
   theme_classic(base_size=12, base_family="Arial")+
