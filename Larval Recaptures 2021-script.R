@@ -439,6 +439,7 @@ var.test(water.transformed$on.water ~ water.transformed$habitat)
 # run model and investigate model output
 library(lme4)
 library(lmerTest)
+library(performance)
 modwat<-lmer(on.water ~ habitat + (1|sample.site/year) + (1|session/year), data=water.transformed)
 modwat1<-lmer(on.water ~ sample.site + (1|session/year), data=water.transformed)
 summary(modwat)
@@ -447,7 +448,6 @@ AIC(modwat,modwat1) # modwat most supported
 compare_performance(modwat, modwat1,rank=T) # modwat most supported
 
 # check model
-library(performance)
 check_model(modwat)
 
 # plot as boxplot
@@ -455,6 +455,8 @@ library(plyr)
 library(ggpubr) 
 count(water.sub, "habitat")
 
+setwd("D:/Plots/Mark_recapture")
+png("watertemp.png", height=150, width=200, units="mm", res=300);print(watertemp) #save plot on local harddrive
 watertemp<-
   ggplot(data=water.sub, aes(habitat,water.temp), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
@@ -468,9 +470,6 @@ watertemp<-
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none")
-#save plot on local harddrive
-setwd("D:/Plots/Mark_recapture")
-png("watertemp.png", height=150, width=200, units="mm", res=300);print(watertemp)
 dev.off()
 
 
@@ -543,6 +542,7 @@ countplot<-
   ggplot(data=count.transformed, aes(habitat,n.total), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
+  facet_wrap(~year)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond (N=57)","Stream (N=61)"))+
@@ -899,6 +899,8 @@ hist(mean.sub$mean.size)
 shapiro.test(mean.sub$mean.size) # non-normal
 var.test(mean.sub$mean.size ~ mean.sub$habitat) #okay
 
+setwd("D:/Plots/Mark_recapture")
+png("sizeplot.png", height=150, width=200, units="mm", res=300);print(sizeplot)
 sizeplot<-
   ggplot(data=mean.sub, aes(habitat,mean.size), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
@@ -913,9 +915,6 @@ sizeplot<-
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none")
-
-setwd("D:/Plots/Mark_recapture")
-png("sizeplot.png", height=150, width=200, units="mm", res=300);print(sizeplot)
 dev.off()
 
 
@@ -1166,6 +1165,48 @@ grid.text("Snout-to-tail length (cm)", x = unit(0.013, "npc"), y = unit(0.79, "n
 dev.off()
 
 
+# create another plot for the mean sizes in ponds and streams per year
+library(ggplot2)
+
+library(tidyverse)
+df.mean1<-aggregate(x=mean.sub$mean.size,na.rm=TRUE,
+                    by=list(mean.sub$habitat,mean.sub$session, mean.sub$year),
+                    FUN=mean)
+
+# rename columns
+df.mean<-df.mean1 %>% 
+  rename(
+    habitat = Group.1,
+    session = Group.2,
+    year =Group.3,
+    mean.size = x
+  )
+str(df.mean)
+
+
+setwd("D:/Plots/Mark_recapture")
+png("meansizeperyear.png", height=150, width=200, units="mm", res=300);print(meanyear)
+meanyear<-
+  ggplot(data=df.mean, aes(x=factor(session,level = c('1', '2', '3',"4","5", "6","7","8", "9","10","11","12")), 
+                           y=mean.size, group=habitat, colour=habitat, shape=habitat)) +
+  geom_line(aes(color=habitat), size=0.5)+
+  geom_point(aes(color=habitat))+
+  facet_wrap(~year)+
+  scale_shape_manual(values=c(16,4,5))+
+  scale_color_manual(values=c("steelblue4", "lightsteelblue3"))+
+  scale_y_continuous(breaks=seq(2,5,1), limits = c(2, 5))+
+  scale_fill_discrete(name = "habitat")+
+  theme_classic(base_size=12, base_family="Arial")+
+  labs(y="Mean larval size (cm)", x="Monitoring event")+
+  theme(axis.text.y=element_text(family="Arial", size=12, color="black"),
+        axis.title.y=element_text(family="Arial", size=12, color="black"),
+        axis.text.x=element_text(family="Arial", size=12, color="black"),
+        axis.title.x=element_text(family="Arial", size=12, color="black"),
+        legend.position = "bottom",
+        legend.title =element_text(family="Arial", size=12, color="black"),
+        legend.text = element_text(family="Arial", size=12, color="black"),)
+dev.off()
+
 
 
 ####################################################################################################################################################################################################
@@ -1273,13 +1314,15 @@ hist(growth$daily.growth.rate)
 shapiro.test(growth$daily.growth.rate) # non-normal
 var.test(growth$daily.growth.rate ~ growth$habitat) #okay
 
+setwd("D:/Plots/Mark_recapture")
+png("growthplot.png", height=150, width=200, units="mm", res=300);print(growthplot)
 growthplot<-
   ggplot(data=growth, aes(habitat,daily.growth.rate), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
-  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
-  annotate("text", x = 1.5, y = 0.065, label = "*")+
+  stat_summary(fun=mean, shape=4, size=1, show.legend=FALSE) +
+  annotate("text", x = 1.5, y = 0.065, label = "*", size=7)+
   scale_x_discrete(labels=c("Pond (N=63)","Stream (N=65)"))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(x="Habitat type", y="Daily growth rate (cm)")+
@@ -1287,9 +1330,6 @@ growthplot<-
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none")
-
-setwd("D:/Plots/Mark_recapture")
-png("growthplot.png", height=150, width=200, units="mm", res=300);print(growthplot)
 dev.off()
 
 
@@ -1383,13 +1423,15 @@ aggregate(inj.sub$perc.injured, by = list(inj.sub$habitat), max, na.rm = TRUE)
 aggregate(inj.sub$perc.injured, by = list(inj.sub$habitat), min, na.rm = TRUE)
 aggregate(inj.sub$perc.injured, by = list(inj.sub$habitat), mean, na.rm = TRUE)
 
+setwd("D:/Plots/Mark_recapture")
+png("injuries.png", height=150, width=200, units="mm", res=300);print(injuries)
 injuries<-
   ggplot(data=inj.sub, aes(habitat,perc.injured), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
-  stat_compare_means(method="wilcox.test", label="p.signif",  label.x = 1.5, label.y = 1)+ # pvalue=0.0056
-  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  stat_summary(fun=mean, shape=4, size=1, show.legend=FALSE) +
+  annotate("text", x = 1.5, y = 1, label = "**", size=7)+
   scale_x_discrete(labels=c("Pond (N=88)","Stream (N=66)"))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(x="Habitat type", y="Percentage of injured larvae")+
@@ -1397,9 +1439,6 @@ injuries<-
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none")
-
-setwd("D:/Plots/Mark_recapture")
-png("injuries.png", height=150, width=200, units="mm", res=300);print(injuries)
 dev.off()
 
 
@@ -1505,13 +1544,15 @@ aggregate(recap.sub$r, by = list(recap.sub$habitat), max, na.rm = TRUE)
 aggregate(recap.sub$r, by = list(recap.sub$habitat), min, na.rm = TRUE)
 
 
+setwd("D:/Plots/Mark_recapture")
+png("recaptures.png", height=150, width=200, units="mm", res=300);print(recaptures)
 recaptures<-
   ggplot(data=recap.sub, aes(habitat,r), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
-  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
-  annotate("text", x = 1.5, y = 1, label = "n.s.")+
+  stat_summary(fun=mean, shape=4,size=1, show.legend=FALSE) +
+  annotate("text", x = 1.5, y = 1, label = "n.s.", size=4)+
   scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(x="Habitat type", y="Recapture rate")+
@@ -1519,9 +1560,6 @@ recaptures<-
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none")
-
-setwd("D:/Plots/Mark_recapture")
-png("recaptures.png", height=150, width=200, units="mm", res=300);print(recaptures)
 dev.off()
 
 
@@ -1615,13 +1653,15 @@ aggregate(surv.sub$phi, by = list(surv.sub$habitat), max, na.rm = TRUE)
 aggregate(surv.sub$phi, by = list(surv.sub$habitat), min, na.rm = TRUE)
 aggregate(surv.sub$phi, by = list(surv.sub$habitat), mean, na.rm = TRUE)
 
+setwd("D:/Plots/Mark_recapture")
+png("survival.png", height=150, width=200, units="mm", res=300);print(survival)
 survival<-
   ggplot(data=surv.sub, aes(habitat,phi), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
-  stat_compare_means(method="wilcox.test", label="p.signif",  label.x = 1.5, label.y = 1)+ # pvalue=0.034
-  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
+  stat_compare_means(method="wilcox.test", label="p.signif",  label.x = 1.5, label.y = 1, size=7)+ # pvalue=0.034
+  stat_summary(fun=mean, shape=4, size=1,show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond (N=32)","Stream (N=24)"))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(x="Habitat type", y="Survival rate")+
@@ -1629,9 +1669,6 @@ survival<-
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none")
-
-setwd("D:/Plots/Mark_recapture")
-png("survival.png", height=150, width=200, units="mm", res=300);print(survival)
 dev.off()
 
 
@@ -1655,75 +1692,6 @@ str(nest.)
 nest.sub<-subset(nest., sample.site!="KoB")
 hist(nest.sub$Nest)
 
-## find best transformation for data
-# first, create objects with the transformations, e.g. logarithm etc.
-library(bestNormalize)
-(arcsinh_nest <- arcsinh_x(nest.sub$phi))
-(boxcox_nest <- boxcox(nest.sub$phi))
-(centerscale_nest <- center_scale(nest.sub$phi))
-(orderNorm_nest <- orderNorm(nest.sub$phi))
-(yeojohnson_nest <- yeojohnson(nest.sub$phi))
-(sqrt_nest <- sqrt(nest.sub$phi))
-(log_nest <- log(nest.sub$phi))
-(exp_nest<-exp_x(nest.sub$phi, standardize = TRUE))
-
-# then have a look at the histograms of the different transformations for first impression
-par(mfrow = c(2,4)) # display all histograms in one window
-hist(nest.sub$Nest)
-MASS::truehist(arcsinh_nest$x.t, main = "Arcsinh transformation", nbins = 12) # x.t stands for the transformed variable
-MASS::truehist(boxcox_nest$x.t, main = "Box Cox transformation", nbins = 12)
-MASS::truehist(centerscale_nest$x.t, main = "center_scale transformation", nbins = 12)
-MASS::truehist(orderNorm_nest$x.t, main = "orderNorm transformation", nbins = 12)
-MASS::truehist(yeojohnson_nest$x.t, main = "Yeo-Johnson transformation", nbins = 12)
-MASS::truehist(sqrt_nest, main = "squareroot transformation", nbins = 12)
-MASS::truehist(log_nest, main = "log transformation", nbins = 12)
-
-# let R recommend the most suitable transformation method
-bn.nest<-bestNormalize(nest.sub$Nest, out_of_sample = FALSE) 
-bn.nest
-
-## create an object for the best transformation
-on.nest <- orderNorm_nest$x.t # ordernorm transformation
-
-## add the new object as column to your data frame
-nest.transformed <- cbind(nest.sub, on.nest)
-str(nest.transformed)
-hist(nest.transformed$on.nest)
-
-## test for normal distribution and homogeneity of variance of the transformed variable
-shapiro.test(nest.transformed$on.nest)
-var.test(nest.transformed$on.nest~ nest.transformed$habitat) 
-
-# transformation did not normalise data
-# use other distribution?
-library(performance)
-library(lme4)
-library(lmerTest)
-
-mod7<-glm(Nest~habitat, data=nest.sub, family=poisson(link="log"))
-mod8<-lm(Nest~habitat, data=nest.sub)
-check_model(mod7)
-check_model(mod8) # this model looks quite okay and way better than mod5, take this
-
-# Check Model Residuals
-library(DHARMa)
-mod7.res<- simulateResiduals(mod7)
-plot(mod7.res) 
-testDispersion(mod7) # not good
-mod8.res<- simulateResiduals(mod8)
-plot(mod8.res)
-testDispersion(mod8) #  looks okay, so take linear model
-
-# set up models
-mnest0<-lm(Nest~habitat,data=nest.sub)
-mnest1<-lmer(Nest~habitat + (1|sample.site),data=nest.sub)
-mnest2<-lmer(Nest~habitat+(1|occasion),data=nest.sub)
-mnest3<-lmer(Nest~habitat+(1|sample.site)+(1|occasion),data=nest.sub)
-AIC(mnest0, mnest1, mnest2, mnest3) # mnest3 most supported
-compare_performance(mnest0, mnest1, mnest2, mnest3, rank = T) # mnest3 most supported
-summary(mnest3)
-check_model(mnest3) # looks good
-
 
 # plot population estimates per habitat
 library(plyr)
@@ -1734,6 +1702,8 @@ aggregate(nest.sub$Nest, by = list(surv.sub$habitat), max, na.rm = TRUE)
 aggregate(nest.sub$Nest, by = list(surv.sub$habitat), min, na.rm = TRUE)
 aggregate(nest.sub$Nest, by = list(surv.sub$habitat), mean, na.rm = TRUE)
 
+setwd("D:/Plots/Mark_recapture")
+png("estimatedpopsize.png", height=150, width=200, units="mm", res=300);print(estimates)
 estimates<-
   ggplot(data=nest.sub, aes(habitat,Nest), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
@@ -1748,9 +1718,6 @@ estimates<-
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none")
-
-setwd("D:/Plots/Mark_recapture")
-png("estimatedpopsize.png", height=150, width=200, units="mm", res=300);print(estimates)
 dev.off()
 
 
