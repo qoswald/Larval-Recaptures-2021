@@ -1682,7 +1682,7 @@ p1<-ggplot(count.KB, aes(x=date.simplified, y=n.total, group=year, colour=year, 
   geom_point(aes(color=year))+
   scale_color_manual(values=c("steelblue4", "darkseagreen4","goldenrod", "firebrick1"))+
   scale_shape_manual(values=c(16,4,5, 8))+
-  scale_y_continuous(breaks=seq(0,100,25), limits = c(0, 100))+
+  scale_y_continuous(breaks=seq(0,200,50), limits = c(0, 200))+
   theme_classic(base_size=12, base_family="Arial")+
   ggtitle("Stream KB")+
   labs(y="Observed number of larvae")+
@@ -1698,7 +1698,7 @@ p2<-ggplot(count.VB, aes(x=date.simplified, y=n.total, group=year, colour=year, 
   geom_point(aes(color=year))+
   scale_color_manual(values=c("steelblue4", "darkseagreen4","goldenrod", "firebrick1"))+
   scale_shape_manual(values=c(16,4,5,8))+
-  scale_y_continuous(breaks=seq(0,100,25), limits = c(0, 100))+
+  scale_y_continuous(breaks=seq(0,200,50), limits = c(0, 200))+
   theme_classic(base_size=12, base_family="Arial")+
   ggtitle("Stream VB")+
   labs(y="Observed number of larvae")+
@@ -1715,7 +1715,7 @@ p3<-ggplot(count.MB, aes(x=date.simplified, y=n.total, group=year, colour=year, 
   geom_point(aes(color=year))+
   scale_color_manual(values=c("steelblue4", "darkseagreen4", "goldenrod","firebrick1"))+
   scale_shape_manual(values=c(16,4,5,8))+
-  scale_y_continuous(breaks=seq(0,100,25), limits = c(0, 100))+
+  scale_y_continuous(breaks=seq(0,200,50), limits = c(0, 200))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(y="Observed number of larvae")+
   ggtitle("Stream MB")+
@@ -1732,7 +1732,7 @@ p4<-ggplot(count.KoB, aes(x=date.simplified, y=n.total, group=year, colour=year,
   geom_point(aes(color=year))+
   scale_shape_manual(values=c(16,4,5,8))+
   scale_color_manual(values=c("steelblue4", "darkseagreen4","goldenrod","firebrick1"))+
-  scale_y_continuous(breaks=seq(0,100,25), limits = c(0, 100))+
+  scale_y_continuous(breaks=seq(0,200,50), limits = c(0, 200))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(y="Observed number of larvae")+
   ggtitle("(Stream) KoB")+
@@ -1749,7 +1749,7 @@ p5<-ggplot(count.KoVK, aes(x=date.simplified, y=n.total, group=year, colour=year
   geom_point(aes(color=year))+
   scale_shape_manual(values=c(16,4,5,8))+
   scale_color_manual(values=c("steelblue4", "darkseagreen4","goldenrod","firebrick1"))+
-  scale_y_continuous(breaks=seq(0,100,25), limits = c(0, 100))+
+  scale_y_continuous(breaks=seq(0,200,50), limits = c(0, 200))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(y="Observed number of larvae")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
@@ -1765,7 +1765,7 @@ p6<-ggplot(count.TG, aes(x=date.simplified, y=n.total, group=year, colour=year, 
   geom_point(aes(color=year))+
   scale_shape_manual(values=c(16,4,5,8))+
   scale_color_manual(values=c("steelblue4", "darkseagreen4","goldenrod","firebrick1"))+
-  scale_y_continuous(breaks=seq(0,100,25), limits = c(0, 100))+
+  scale_y_continuous(breaks=seq(0,200,50), limits = c(0, 200))+
   theme_classic(base_size=12, base_family="Arial")+
   ggtitle("Pond TG")+
   labs(y="Observed number of larvae")+
@@ -2397,9 +2397,9 @@ count(ind.dat.2, "notes")
 growtha<-subset(ind.dat.2, notes!="ssf"| is.na(notes))
 growth<-subset(growtha, sample.site!="KoB") # remove KoB, since it's in between pond and stream
 count(growth, "habitat")
-aggregate(growth$daily.growth.rate, by = list(growth$habitat), max)
-aggregate(growth$daily.growth.rate, by = list(growth$habitat), min)
-aggregate(growth$daily.growth.rate, by = list(growth$habitat), mean, na.rm = TRUE)
+aggregate(growth$daily.growth.rate, by = list(growth$habitat, growth$year), max)
+aggregate(growth$daily.growth.rate, by = list(growth$habitat,growth$year), min)
+aggregate(growth$daily.growth.rate, by = list(growth$habitat,growth$year), mean, na.rm = TRUE)
 
 hist(growth$daily.growth.rate)
 shapiro.test(growth$daily.growth.rate) # non-normal
@@ -2408,8 +2408,8 @@ var.test(growth$daily.growth.rate ~ growth$habitat) # not okay
 growthplot<-
   ggplot(data=growth, aes(habitat,daily.growth.rate), fill=habitat)+
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
-  geom_jitter(aes(fill=habitat), shape=21)+
-  facet_wrap(~year)+
+  geom_jitter(aes(fill=habitat), shape=21, width=0.35)+
+  #facet_wrap(~year)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
   stat_summary(fun=mean, shape=4, size=1, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond","Stream"))+
@@ -2423,10 +2423,10 @@ growthplot<-
 setwd("D:/Plots/Mark_recapture")
 library(gridExtra)
 library(grid)
-png("growthperyear.png", height=150, width=200, units="mm", res=300);print(growthplot)
+png("growth.png", height=150, width=200, units="mm", res=300);print(growthplot)
 growthplot
-grid.text("*", x = unit(0.324, "npc"), y = unit(0.92, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
-grid.text("ns", x = unit(0.772, "npc"), y = unit(0.925, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
+#grid.text("*", x = unit(0.324, "npc"), y = unit(0.92, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
+grid.text("ns", x = unit(0.55, "npc"), y = unit(0.95, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
 dev.off()
 
 
@@ -2833,7 +2833,7 @@ recapsyear<-
   ggplot(data=recap.sub, aes(habitat,(r*100)), fill=habitat)+ # r*100 -> percentage
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
-  facet_wrap(~year)+
+  #facet_wrap(~year)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond","Stream"))+
@@ -2846,10 +2846,10 @@ recapsyear<-
 
 library(gridExtra)
 library(grid)
-png("recapturesperyear.png", height=150, width=200, units="mm", res=300);print(recapsyear)
+png("recaptures.png", height=150, width=200, units="mm", res=300);print(recapsyear)
 recapsyear
-grid.text("ns", x = unit(0.305, "npc"), y = unit(0.925, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
-grid.text("ns", x = unit(0.765, "npc"), y = unit(0.925, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
+grid.text("ns", x = unit(0.55, "npc"), y = unit(0.95, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
+#grid.text("ns", x = unit(0.765, "npc"), y = unit(0.925, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
 dev.off()
 
 ####################################################################################################################################################################################################
@@ -2960,7 +2960,7 @@ survivalyear<-
   ggplot(data=surv.sub, aes(habitat,(phi*100)), fill=habitat)+ # phi*100 -> percentage
   geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
   geom_jitter(aes(fill=habitat), shape=21)+
-  facet_wrap(~year)+
+  #facet_wrap(~year)+
   scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
   scale_x_discrete(labels=c("Pond","Stream"))+
@@ -2973,10 +2973,10 @@ survivalyear<-
 
 library(gridExtra)
 library(grid)
-png("survivalperyear.png", height=150, width=200, units="mm", res=300);print(survivalyear)
+png("survival.png", height=150, width=200, units="mm", res=300);print(survivalyear)
 survivalyear
-grid.text("*", x = unit(0.285, "npc"), y = unit(0.925, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
-grid.text("ns", x = unit(0.758, "npc"), y = unit(0.925, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
+#grid.text("NS", x = unit(0.285, "npc"), y = unit(0.925, "npc"), gp=gpar(fontfamily="Arial", fontsize=10))
+grid.text("*", x = unit(0.55, "npc"), y = unit(0.98, "npc"), gp=gpar(fontfamily="Arial", fontsize=12))
 dev.off()
 
 
@@ -3065,26 +3065,6 @@ check_model(mnest3)
 compare_performance(mnest0,mnest1, mnest2,mnest3, rank = T) # mnest2 best performance score
 
 
-# plot larval population size as boxplot over all sample sites per year
-library(plyr)
-library(ggpubr) 
-setwd("D:/Plots/Mark_recapture")
-png("nestplot.png", height=150, width=200, units="mm", res=300);print(nestplot)
-nestplot<-
-  ggplot(data=nest.sub, aes(year,Nest), fill=year)+
-  geom_boxplot(aes(fill=year), outlier.shape = NA)+
-  geom_jitter(aes(fill=year), shape=21)+
-  scale_fill_manual(values=c("goldenrod", "firebrick1"))+
-  annotate("text", x = 1.5, y =1500, label = "*", size=5.5)+
-  stat_summary(fun=mean, shape=8, show.legend=FALSE) +
-  theme_classic(base_size=12, base_family="Arial")+
-  labs(x="Year", y="Estimated population size")+
-  scale_y_continuous(breaks=seq(0,1500,500), limits = c(0, 1500))+
-  theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
-        axis.text.y=element_text(family="Arial", size=12, color="black"),
-        legend.position="none")
-dev.off()
-
 
 
 
@@ -3092,6 +3072,7 @@ dev.off()
 # comparison weekly and monthly 2021
 library(readr)
 library(ggplot2)
+library(readr)
 pop.est21 <- read_delim("pop-est-larvae_allinone.csv", delim = ";")
 
 pop.est.1<-subset(pop.est21, KB.week.Nest!="NA")
@@ -3709,7 +3690,7 @@ g3
 
 pop.est.4c<-subset(pop.est.both, KoB.week.Nest!="NA")
 g4<-ggplot(pop.est.4c, aes(y=KoB.week.Nest, x=date, group=year, colour=year,
-                             fill=year, shape=year))+ ggtitle("Stream KoB")+
+                             fill=year, shape=year))+ ggtitle("(Stream) KoB")+
   geom_point(aes(color=year)) +
   geom_line(aes(color=year)) +
   geom_ribbon(aes(ymin=(KoB.week.Nest-KoB.week.Nest.se), ymax=(KoB.week.Nest+KoB.week.Nest.se)), alpha=.3, linetype=0)+
@@ -3730,7 +3711,7 @@ g4
 
 pop.est.5c<-subset(pop.est.both, KoVK.week.Nest!="NA")
 g5<-ggplot(pop.est.5c, aes(y=KoVK.week.Nest, x=date, group=year, colour=year,
-                             fill=year, shape=year))+ ggtitle("Stream KoVK")+
+                             fill=year, shape=year))+ ggtitle("Pond KoVK")+
   geom_point(aes(color=year)) +
   geom_line(aes(color=year)) +
   geom_ribbon(aes(ymin=(KoVK.week.Nest-KoVK.week.Nest.se), ymax=(KoVK.week.Nest+KoVK.week.Nest.se)), alpha=.3, linetype=0)+
@@ -3753,7 +3734,7 @@ g5
 
 pop.est.6c<-subset(pop.est.both, TG.week.Nest!="NA")
 g6<-ggplot(pop.est.6c, aes(y=TG.week.Nest, x=date, group=year, colour=year,
-                           fill=year, shape=year))+ ggtitle("Stream TG")+
+                           fill=year, shape=year))+ ggtitle("Pond TG")+
   geom_point(aes(color=year)) +
   geom_line(aes(color=year)) +
   geom_ribbon(aes(ymin=(TG.week.Nest-TG.week.Nest.se), ymax=(TG.week.Nest+TG.week.Nest.se)), alpha=.3, linetype=0)+
@@ -3776,7 +3757,7 @@ g6
 
 pop.est.7c<-subset(pop.est.both, SG.week.Nest!="NA")
 g7<-ggplot(pop.est.7c, aes(y=SG.week.Nest, x=date, group=year, colour=year,
-                           fill=year, shape=year))+ ggtitle("Stream SG")+
+                           fill=year, shape=year))+ ggtitle("Pond SG")+
   geom_point(aes(color=year)) +
   geom_line(aes(color=year)) +
   geom_ribbon(aes(ymin=(SG.week.Nest-SG.week.Nest.se), ymax=(SG.week.Nest+SG.week.Nest.se)), alpha=.3, linetype=0)+
@@ -3798,7 +3779,7 @@ g7
 
 pop.est.8c<-subset(pop.est.both, TT.week.Nest!="NA")
 g8<-ggplot(pop.est.8c, aes(y=TT.week.Nest, x=date, group=year, colour=year,
-                           fill=year, shape=year))+ ggtitle("Stream TT")+
+                           fill=year, shape=year))+ ggtitle("Pond TT")+
   geom_point(aes(color=year)) +
   geom_line(aes(color=year)) +
   geom_ribbon(aes(ymin=(TT.week.Nest-TT.week.Nest.se), ymax=(TT.week.Nest+TT.week.Nest.se)), alpha=.3, linetype=0)+
@@ -3820,7 +3801,7 @@ g8
 
 pop.est.9c<-subset(pop.est.both, WT.week.Nest!="NA")
 g9<-ggplot(pop.est.9c, aes(y=WT.week.Nest, x=date, group=year, colour=year,
-                           fill=year, shape=year))+ ggtitle("Stream WT")+
+                           fill=year, shape=year))+ ggtitle("Pond WT")+
   geom_point(aes(color=year)) +
   geom_line(aes(color=year)) +
   geom_ribbon(aes(ymin=(WT.week.Nest-WT.week.Nest.se), ymax=(WT.week.Nest+WT.week.Nest.se)), alpha=.3, linetype=0)+
@@ -3955,15 +3936,14 @@ library(ggpubr)
 setwd("D:/Plots/Mark_recapture")
 png("superpopulation.png", height=150, width=200, units="mm", res=300);print(superpopulation) #save plot on local harddrive
 superpopulation<-
-  ggplot(data=super.sub, aes(habitat, Nsuper), fill=habitat)+
-  geom_boxplot(aes(fill=habitat), outlier.shape = NA)+
-  geom_jitter(aes(fill=habitat), shape=21, width=0.25)+
-  scale_fill_manual(values=c("steelblue4", "lightsteelblue3"))+
-  stat_compare_means(method="t.test", label="p.signif",  label.x = 1.5, label.y = 3300)+ # pvalue=0.034
+  ggplot(data=super.sub, aes(year, Nsuper), fill=year)+
+  geom_boxplot(aes(fill=year), outlier.shape = NA)+
+  geom_jitter(aes(fill=year), shape=21, width=0.25)+
+  scale_fill_manual(values=c("goldenrod", "firebrick1"))+
+  annotate("text", x = 1.5, y =15900, label = "ns")+
   stat_summary(fun=mean, shape=8, show.legend=FALSE) +
-  scale_x_discrete(labels=c("Pond (N=4)","Stream (N=3)"))+
   theme_classic(base_size=12, base_family="Arial")+
-  labs(x="Habitat type", y="Superpopulation size")+
+  labs(x="Year", y="Superpopulation size")+
   theme(axis.text.x=element_text(family="Arial", size=12, color="black"), 
         axis.text.y=element_text(family="Arial", size=12, color="black"),
         legend.position="none")
