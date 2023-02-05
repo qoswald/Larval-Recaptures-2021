@@ -1466,7 +1466,7 @@ hist(water.sub$n.total)
 plot(water.sub$habitat, water.sub$water.temp)
 hist(water.sub$water.temp)
 shapiro.test(water.sub$water.temp) # if > 0.05, i.e. NOT significant -> good, normal distribution
-var.test(water.sub$water.temp ~ water.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+fligner.test(water.sub$water.temp ~ water.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
 
 ## if data is not normally distributed, try to transform data
 # first, create objects with the transformations, e.g. logarithm etc.
@@ -1579,6 +1579,12 @@ count.sub<- subset(overall.dat, sample.site!="KoB") # exclude KoB, because it's 
 str(count.sub)
 hist(count.sub$n.total)
 
+## check for normal distribution
+plot(count.sub$habitat, count.sub$n.total)
+hist(count.sub$n.total)
+shapiro.test(count.sub$n.total) # if > 0.05, i.e. NOT significant -> good, normal distribution
+fligner.test(count.sub$n.total ~ count.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+
 ## find best transformation for data
 # first, create objects with the transformations, e.g. logarithm etc.
 library(bestNormalize)
@@ -1613,6 +1619,7 @@ hist(count.transformed$on.count)
 
 ## test for normal distribution and homogeneity of variance of the transformed variable
 shapiro.test(count.transformed$on.count)
+var.test(count.transformed$on.count ~ count.transformed$habitat)
 
 # run model and investigate model output
 library(lme4)
@@ -1879,6 +1886,11 @@ mean.sub<-subset(overall.dat, sample.site!="KoB")
 # no need to remove "ssfs", because this was already considered in the raw-data, mean size was calculated without "ssfs"
 str(mean.sub)
 hist(mean.sub$mean.size)
+
+## check for normal distribution
+shapiro.test(mean.sub$mean.size) # if > 0.05, i.e. NOT significant -> good, normal distribution
+fligner.test(mean.sub$mean.size ~ mean.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+
 size.tab <- ddply(mean.sub, c("year","habitat"),summarise, 
             N    = length(!is.na(mean.size)),
             mean = mean(mean.size,na.rm=TRUE),
@@ -2205,6 +2217,12 @@ str(ind.size)
 ind.size1<-subset(ind.size, sample.site!="KoB")
 ind.sub<-subset(ind.size1, note!="ssf")
 hist(ind.sub$daily.growth)
+
+## check for normal distribution
+shapiro.test(ind.sub$daily.growth) # if > 0.05, i.e. NOT significant -> good, normal distribution
+fligner.test(ind.sub$daily.growth ~ ind.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+
+
 ind.tab <- ddply(ind.sub, c("year","habitat"),summarise, 
                     N    = length(!is.na(daily.growth)),
                     mean = mean(daily.growth,na.rm=TRUE),
@@ -2449,6 +2467,10 @@ str(overall.dat)
 inj.sub<-subset(overall.dat, sample.site!="KoB")
 hist(inj.sub$perc.injured)
 
+## check for normal distribution
+shapiro.test(inj.sub$perc.injured) # if > 0.05, i.e. NOT significant -> good, normal distribution
+fligner.test(inj.sub$perc.injured ~ inj.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+
 ## find best transformation for data
 # first, create objects with the transformations, e.g. logarithm etc.
 library(bestNormalize)
@@ -2485,7 +2507,7 @@ hist(inj.transformed$on.inj)
 
 ## test for normal distribution and homogeneity of variance of the transformed variable
 shapiro.test(inj.transformed$on.inj) 
-var.test(inj.transformed$on.inj ~ inj.transformed$habitat) 
+fligner.test(inj.transformed$on.inj ~ inj.transformed$habitat) 
 
 # transformation did not normalise data
 # use other distribution?
@@ -2750,6 +2772,10 @@ str(recap.)
 recap.sub<-subset(recap., sample.site!="KoB")
 hist(recap.sub$r)
 
+## check for normal distribution
+shapiro.test(recap.sub$r) # if > 0.05, i.e. NOT significant -> good, normal distribution
+fligner.test(recap.sub$r ~ recap.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+
 ## find best transformation for data
 # first, create objects with the transformations, e.g. logarithm etc.
 library(bestNormalize)
@@ -2786,7 +2812,7 @@ hist(recap.transformed$cs.recap)
 
 ## test for normal distribution and homogeneity of variance of the transformed variable
 shapiro.test(recap.transformed$cs.recap) 
-var.test(recap.transformed$cs.recap ~ recap.transformed$habitat) 
+fligner.test(recap.transformed$cs.recap ~ recap.transformed$habitat) 
 
 # transformation did not normalise data
 # use other distribution?
@@ -2870,6 +2896,11 @@ str(surv.)
 # prepare and inspect data
 surv.sub<-subset(surv., sample.site!="KoB")
 hist(surv.sub$phi)
+
+## check for normal distribution
+shapiro.test(surv.sub$phi) # if > 0.05, i.e. NOT significant -> good, normal distribution
+fligner.test(surv.sub$phi ~ surv.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+
 library(plyr)
 surv.tab <- ddply(surv.sub, c("year","habitat"),summarise, 
                   N    = length(!is.na(phi)),
@@ -2915,8 +2946,7 @@ hist(surv.transformed$on.surv)
 
 ## test for normal distribution and homogeneity of variance of the transformed variable
 shapiro.test(surv.transformed$on.surv)
-var.test(surv.transformed$phi~ surv.transformed$habitat) 
-var.test(surv.transformed$phi~ surv.transformed$year) 
+fligner.test(surv.transformed$phi~ surv.transformed$habitat) 
 
 # transformation did not normalise data
 # use other distribution?
@@ -2999,6 +3029,11 @@ nest.sub<-subset(nest., sample.site!="KoB")
 # no need to remove "ssfs", because this was already considered in the raw-data, mean size was calculated without "ssfs"
 str(nest.sub)
 hist(nest.sub$Nest)
+
+## check for normal distribution
+shapiro.test(nest.sub$Nest) # if > 0.05, i.e. NOT significant -> good, normal distribution
+fligner.test(nest.sub$Nest ~ nest.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+
 library(plyr)
 nest.tab <- ddply(nest.sub, c("year","habitat"),summarise, 
                   N    = length(!is.na(Nest)),
@@ -3034,7 +3069,7 @@ bn.nest<-bestNormalize(nest.sub$Nest, out_of_sample = FALSE)
 bn.nest
 
 ## create an object for the best transformation
-on.nest <- orderNorm_mean$x.t # ordernorm transformation
+on.nest <- orderNorm_nest$x.t # ordernorm transformation
 
 ## add the new object as column to your data frame
 nest.transformed <- cbind(nest.sub, on.nest)
@@ -3807,8 +3842,8 @@ g9<-ggplot(pop.est.9c, aes(y=WT.week.Nest, x=date, group=year, colour=year,
   geom_ribbon(aes(ymin=(WT.week.Nest-WT.week.Nest.se), ymax=(WT.week.Nest+WT.week.Nest.se)), alpha=.3, linetype=0)+
   scale_y_continuous(breaks=seq(0,1500,250), limits = c(0, 1500))+
   scale_shape_manual(values=c(16,4))+
-  scale_color_manual(values=c("goldenrod", "firebrick1"))+
-  scale_fill_manual(values=c("goldenrod", "firebrick1"))+
+  scale_color_manual(values=c("firebrick1","goldenrod"))+
+  scale_fill_manual(values=c("firebrick1","goldenrod"))+
   scale_x_date(date_breaks = "1 month", date_minor_breaks = "1 week",date_labels = "%b", limits=c(as.Date("2021-03-01"), as.Date("2021-05-15")))+
   theme_classic(base_size=12, base_family="Arial")+
   labs(y="Estimated number of larvae", x="Month")+
