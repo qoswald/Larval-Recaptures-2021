@@ -2471,6 +2471,14 @@ hist(inj.sub$perc.injured)
 shapiro.test(inj.sub$perc.injured) # if > 0.05, i.e. NOT significant -> good, normal distribution
 fligner.test(inj.sub$perc.injured ~ inj.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
 
+library(plyr)
+inj.tab <- ddply(inj.sub, c("year","habitat"),summarise, 
+                 N    = length(!is.na(perc.injured)),
+                 mean = mean(perc.injured,na.rm=TRUE),
+                 sd   = sd(perc.injured,na.rm=TRUE),
+                 max = max(perc.injured,na.rm=TRUE),
+                 min = min (perc.injured,na.rm=TRUE))
+
 ## find best transformation for data
 # first, create objects with the transformations, e.g. logarithm etc.
 library(bestNormalize)
@@ -2775,6 +2783,14 @@ hist(recap.sub$r)
 ## check for normal distribution
 shapiro.test(recap.sub$r) # if > 0.05, i.e. NOT significant -> good, normal distribution
 fligner.test(recap.sub$r ~ recap.sub$habitat) # if > 0.05, i.e. NOT significant -> good, assumption of homogeneity fulfilled
+
+library(plyr)
+recap.tab <- ddply(recap.sub, c("year","habitat"),summarise, 
+                 N    = length(!is.na(r)),
+                 mean = mean(r,na.rm=TRUE),
+                 sd   = sd(r,na.rm=TRUE),
+                 max = max(r,na.rm=TRUE),
+                 min = min (r,na.rm=TRUE))
 
 ## find best transformation for data
 # first, create objects with the transformations, e.g. logarithm etc.
